@@ -1,14 +1,14 @@
-import React from "react";
-import ReactDOM from "react-dom";
-import { Provider } from "react-redux";
-import { MuiThemeProvider, createMuiTheme } from "@material-ui/core/styles";
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { Provider } from 'react-redux';
+import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 
-import { lang } from "./services/i18n/lang";
-import configureStore from "./store/configureStore";
-import "./index.css";
-import App from "./App";
-import registerServiceWorker from "./registerServiceWorker";
-import theme1 from "./themes/theme1/";
+import { lang } from './services/i18n/lang';
+import configureStore from './store/configureStore';
+import './index.css';
+import App from './App';
+import registerServiceWorker from './registerServiceWorker';
+import theme1 from './themes/theme1';
 
 lang
   .init({
@@ -25,7 +25,7 @@ lang
           <App />
         </MuiThemeProvider>
       </Provider>,
-      document.getElementById("root")
+      document.getElementById('root')
     );
     registerServiceWorker();
   })
