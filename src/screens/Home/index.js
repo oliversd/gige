@@ -107,8 +107,7 @@ class Home extends Component {
         <main>
           <div>
             <div>
-              <h1>GigE</h1>
-              <h2>Create a Service</h2>
+              <h1>Create a Service</h1>
               <p>
                 <label for="title">
                   Title
