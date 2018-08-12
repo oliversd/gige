@@ -1,6 +1,6 @@
 body {
-  background: #022135;
-  color: #fff;
+  background: #efefef;
+  color: #333;
   margin: 0;
   padding: 0;
   font-family: 'Noto Sans', sans-serif;
@@ -9,7 +9,7 @@ body {
 a,
 a:hover,
 a:visited {
-  color: #fff;
+  color: #333;
   text-decoration: none;
 }
 
