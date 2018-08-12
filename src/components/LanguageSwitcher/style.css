@@ -1,0 +1,19 @@
+ul.language-switcher {
+  display: block;
+  width: 100%;
+  text-align: right;
+  margin-left: -60px;
+}
+
+ul.language-switcher > li {
+  display: inline;
+  padding-left: 0.5rem;
+}
+
+ul.language-switcher > li:last-child {
+  padding-right: 0.8rem;
+}
+
+ul.language-switcher > li.active > a {
+  color: #ff5f2f;
+}
