@@ -1,22 +1,50 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import Avatar from '@material-ui/core/Avatar';
+import Button from '@material-ui/core/Button';
+import CssBaseline from '@material-ui/core/CssBaseline';
+import FormControl from '@material-ui/core/FormControl';
 import Input from '@material-ui/core/Input';
 import InputLabel from '@material-ui/core/InputLabel';
-import FormHelperText from '@material-ui/core/FormHelperText';
-import FormControl from '@material-ui/core/FormControl';
-// import t from "../../services/i18n/lang";
+import NewIcon from '@material-ui/icons/SendOutlined';
+import Paper from '@material-ui/core/Paper';
+import Typography from '@material-ui/core/Typography';
+import withStyles from '@material-ui/core/styles/withStyles';
+import InputAdornment from '@material-ui/core/InputAdornment';
 
-// actions import
-// hoc import
-// components import
-// import Loading from '../../components/Loading';
+const styles = theme => ({
+  layout: {
+    width: 'auto',
+    marginLeft: theme.spacing.unit * 3,
+    marginRight: theme.spacing.unit * 3,
+    [theme.breakpoints.up(400 + theme.spacing.unit * 3 * 2)]: {
+      width: 400,
+      marginLeft: 'auto',
+      marginRight: 'auto'
+    }
+  },
+  paper: {
+    marginTop: theme.spacing.unit * 8,
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    padding: `${theme.spacing.unit * 2}px ${theme.spacing.unit * 3}px ${theme.spacing.unit * 3}px`
+  },
+  avatar: {
+    margin: theme.spacing.unit,
+    backgroundColor: theme.palette.primary.dark
+  },
+  form: {
+    marginTop: theme.spacing.unit
+  },
+  submit: {
+    marginTop: theme.spacing.unit * 3
+  }
+});
 
-// import './style.css';
-
-class CreateService extends Component {
+class SignIn extends Component {
   state = {
-    from: null,
-    fromContract: [],
     title: '',
     description: '',
     image: 'fake.png',
@@ -25,27 +53,15 @@ class CreateService extends Component {
     price: 0
   };
 
-  getValue = async () => {
-    try {
-      const { web3, instance } = this.props.contract;
-      const accounts = await web3.eth.getAccounts();
-      const from = accounts[0];
-      const result = await instance.methods.services(1).call({ from });
-      console.log(result);
-      this.setState({ fromContract: result });
-    } catch (e) {
-      console.log(e);
-    }
-  };
-
   handleChange = (e) => {
     this.setState({ [e.target.id]: e.target.value });
   };
 
-  createNewService = async () => {
+  createNewService = async (e) => {
+    e.preventDefault();
     try {
-      if (this.props.contract && this.props.contract.web3) {
-        const { web3, instance } = this.props.contract;
+      const { web3, instance } = this.props.contract;
+      if (this.props.contract && web3) {
         const accounts = await web3.eth.getAccounts();
         console.log(accounts[0]);
         const from = accounts[0];
@@ -72,88 +88,111 @@ class CreateService extends Component {
   };
 
   render() {
+    const { classes } = this.props;
+    const {
+      title, description, image, category, subcategory, price
+    } = this.state;
+
     return (
-      <div>
-        <h1>
-Create a Service
-        </h1>
-        <p>
-          <FormControl>
-            <InputLabel htmlFor="title">
-Name
-            </InputLabel>
-            <Input id="title" value={this.state.title} onChange={this.handleChange} />
-          </FormControl>
-        </p>
-        <p>
-          <label htmlFor="description">
-            Description
-            <br />
-            <input
-              type="text"
-              id="description"
-              value={this.state.description}
-              onChange={this.handleChange}
-            />
-          </label>
-        </p>
-        <p>
-          <label htmlFor="image">
-            Image
-            <br />
-            <input type="text" id="image" value={this.state.image} onChange={this.handleChange} />
-          </label>
-        </p>
-        <p>
-          <label htmlFor="category">
-            Category
-            <br />
-            <input
-              type="text"
-              id="category"
-              value={this.state.category}
-              onChange={this.handleChange}
-            />
-          </label>
-        </p>
-        <p>
-          <label htmlFor="subcategory">
-            Subcategory
-            <br />
-            <input
-              type="text"
-              id="subcategory"
-              value={this.state.subcategory}
-              onChange={this.handleChange}
-            />
-          </label>
-        </p>
-        <p>
-          <label htmlFor="price">
-            Price
-            <br />
-            <input type="text" id="price" value={this.state.price} onChange={this.handleChange} />
-          </label>
-        </p>
-        <button
-          onClick={() => this.createNewService(this.state.contractInstance, this.state.from, this.state.value)
-          }
-        >
-          Update
-        </button>
-        <h1>
-From Contract:
-        </h1>
-        <h1>
-          {this.state.fromContract.title}
-        </h1>
-        <button onClick={() => this.getValue(this.state.contractInstance, this.state.from)}>
-          Get Value
-        </button>
-      </div>
+      <React.Fragment>
+        <CssBaseline />
+        <main className={classes.layout}>
+          <Paper className={classes.paper}>
+            <Avatar className={classes.avatar}>
+              <NewIcon />
+            </Avatar>
+            <Typography variant="headline">
+Create Service
+            </Typography>
+            <form className={classes.form} onSubmit={this.createNewService}>
+              <FormControl margin="normal" required fullWidth>
+                <InputLabel htmlFor="title">
+Title
+                </InputLabel>
+                <Input
+                  id="title"
+                  name="title"
+                  value={title}
+                  onChange={this.handleChange}
+                  autoFocus
+                />
+              </FormControl>
+              <FormControl margin="normal" required fullWidth>
+                <InputLabel htmlFor="description">
+Description
+                </InputLabel>
+                <Input
+                  id="description"
+                  name="description"
+                  value={description}
+                  onChange={this.handleChange}
+                />
+              </FormControl>
+              <FormControl margin="normal" required fullWidth>
+                <InputLabel htmlFor="image">
+Image
+                </InputLabel>
+                <Input id="image" name="image" value={image} onChange={this.handleChange} />
+              </FormControl>
+              <FormControl margin="normal" required fullWidth>
+                <InputLabel htmlFor="category">
+Category
+                </InputLabel>
+                <Input
+                  id="category"
+                  name="category"
+                  value={category}
+                  onChange={this.handleChange}
+                />
+              </FormControl>
+              <FormControl margin="normal" required fullWidth>
+                <InputLabel htmlFor="subcategory">
+Subcategory
+                </InputLabel>
+                <Input
+                  id="subcategory"
+                  name="subcategory"
+                  value={subcategory}
+                  onChange={this.handleChange}
+                />
+              </FormControl>
+              <FormControl margin="normal" required fullWidth>
+                <InputLabel htmlFor="price">
+Price
+                </InputLabel>
+                <Input
+                  id="price"
+                  name="price"
+                  type="number"
+                  value={price}
+                  onChange={this.handleChange}
+                  endAdornment={(
+                    <InputAdornment position="end">
+ETH
+                    </InputAdornment>
+                  )}
+                />
+              </FormControl>
+              <Button
+                type="submit"
+                fullWidth
+                variant="raised"
+                color="primary"
+                className={classes.submit}
+              >
+                Create
+              </Button>
+            </form>
+          </Paper>
+        </main>
+      </React.Fragment>
     );
   }
 }
+
+SignIn.propTypes = {
+  classes: PropTypes.shape({}).isRequired
+};
 
 const mapStateToProps = state => ({
   contract: state.contract
@@ -164,4 +203,4 @@ const mapDispatchToProps = dispatch => ({});
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(CreateService);
+)(withStyles(styles)(SignIn));

@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Link } from 'react-router-dom';
 import { withStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -53,9 +54,11 @@ class MenuAppBar extends React.Component {
             <IconButton className={classes.menuButton} color="inherit" aria-label="Menu">
               <MenuIcon />
             </IconButton>
-            <Typography variant="title" color="inherit" className={classes.flex}>
-              GigE
-            </Typography>
+            <Link to="/" className={classes.flex}>
+              <Typography variant="title" style={{ color: '#fff' }}>
+                GigE
+              </Typography>
+            </Link>
             {auth && (
               <div>
                 <IconButton
