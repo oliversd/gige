@@ -25,17 +25,6 @@ function WithAsyncWeb3(Component) {
       const contract = await this.props.getContract();
       if (!contract) {
         console.log('There is no contract or web3 instance');
-      } else {
-        this.props.contract.instance.events
-          .Created()
-          .on('data', event => {
-            console.log(event); // same results as the optional callback above
-          })
-          .on('changed', event => {
-            // remove event from local database
-            console.log(event);
-          })
-          .on('error', console.error);
       }
     }
 
@@ -45,8 +34,9 @@ function WithAsyncWeb3(Component) {
           {this.props.error ? (
             <div style={{ width: '100%', textAlign: 'center' }}>
               <h3>
-                <WarningIcon style={{ position: 'relative', top: 5 }} /> Please check that you have
-                metamask installed and running or another Ethereum provider
+                <WarningIcon style={{ position: 'relative', top: 5 }} /> Please
+                check that you have metamask installed and running or another
+                Ethereum provider
               </h3>
             </div>
           ) : (
