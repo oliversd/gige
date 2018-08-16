@@ -14,13 +14,8 @@ function WithAsyncWeb3(Component) {
     }
 
     componentDidUpdate(prevProps) {
-      if (!this.props.web3 && !this.props.error) {
+      if (!this.props.contract.web3 && !this.props.error) {
         this.checkContract();
-      } else if (!this.props.error) {
-        this.props.web3.eth.net
-          .getNetworkType()
-          .then(network => console.log(network))
-          .catch(error => console.log(error));
       }
 
       return null;
@@ -30,6 +25,17 @@ function WithAsyncWeb3(Component) {
       const contract = await this.props.getContract();
       if (!contract) {
         console.log('There is no contract or web3 instance');
+      } else {
+        this.props.contract.instance.events
+          .Created()
+          .on('data', event => {
+            console.log(event); // same results as the optional callback above
+          })
+          .on('changed', event => {
+            // remove event from local database
+            console.log(event);
+          })
+          .on('error', console.error);
       }
     }
 
@@ -56,7 +62,7 @@ function WithAsyncWeb3(Component) {
   };*/
 
   const mapStateToProps = state => ({
-    web3: state.contract.web3,
+    contract: state.contract,
     error: state.contract.error
   });
 

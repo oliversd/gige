@@ -53,6 +53,25 @@ class SignIn extends Component {
     price: 0
   };
 
+  componentDidMount() {
+    const { web3, instance } = this.props.contract;
+    if (this.props.contract && web3 && instance && instance.options) {
+      console.log('EVENTOS');
+      instance.events
+        .Created((error, event) => {
+          console.log(error);
+          console.log(event);
+        })
+        .on('data', (event) => {
+          console.log(event); // same results as the optional callback above
+        })
+        .on('changed', (event) => {
+          console.log(event);
+        })
+        .on('error', console.error);
+    }
+  }
+
   handleChange = (e) => {
     this.setState({ [e.target.id]: e.target.value });
   };
@@ -61,6 +80,7 @@ class SignIn extends Component {
     e.preventDefault();
     try {
       const { web3, instance } = this.props.contract;
+
       if (this.props.contract && web3) {
         const accounts = await web3.eth.getAccounts();
         console.log(accounts[0]);
@@ -69,7 +89,7 @@ class SignIn extends Component {
           title, description, image, category, subcategory, price
         } = this.state;
         const priceBN = new web3.utils.BN(price);
-        const result = await instance.methods
+        await instance.methods
           .createService(
             title,
             description,
@@ -80,10 +100,9 @@ class SignIn extends Component {
           )
           .send({ from, gas: 2100000 })
           .on('transactionHash', transactionHash => console.log(transactionHash));
-        console.log(result);
       }
-    } catch (e) {
-      console.log(e);
+    } catch (error) {
+      console.log(error);
     }
   };
 

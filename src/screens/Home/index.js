@@ -13,7 +13,8 @@ import './style.css';
 class Home extends Component {
   state = {
     from: null,
-    fromContract: []
+    fromContract: [],
+    services: []
   };
 
   getValue = async () => {
@@ -21,9 +22,34 @@ class Home extends Component {
       const { web3, instance } = this.props.contract;
       const accounts = await web3.eth.getAccounts();
       const from = accounts[0];
-      const result = await instance.methods.services(3).call({ from });
+      const result = await instance.methods.services(0).call({ from });
       console.log(result);
       this.setState({ fromContract: result });
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  getList = async () => {
+    try {
+      const { web3, instance } = this.props.contract;
+      const accounts = await web3.eth.getAccounts();
+      const from = accounts[0];
+      const result = await instance.methods.getServices().call({ from });
+      console.log(result);
+      if (result.length > 0) {
+        const serviceList = [];
+        result.map(async (index) => {
+          try {
+            const service = await instance.methods.services(index).call({ from });
+            serviceList.push(service);
+          } catch (e) {
+            console.log(e);
+          }
+        });
+        console.log(serviceList);
+        await this.setState({ services: serviceList });
+      }
     } catch (e) {
       console.log(e);
     }
@@ -45,9 +71,21 @@ From Contract:
         <h1>
           {this.state.fromContract.title}
         </h1>
-        <button onClick={() => this.getValue(this.state.contractInstance, this.state.from)}>
+        <button onClick={() => this.getList(this.state.contractInstance, this.state.from)}>
           Get Value
         </button>
+        {this.state.services.map(service => (
+          <div key={service.id}>
+            <p>
+              {service.title}
+            </p>
+            {service.description}
+            <p />
+            <p>
+              {service.price}
+            </p>
+          </div>
+        ))}
       </div>
     );
   }

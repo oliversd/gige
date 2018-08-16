@@ -6,8 +6,11 @@ contract GigEService {
     uint public idNumber = 0;
     uint public orderNumber = 0;
     uint[] public serviceList;
+
+    event Created(uint id);
     
     struct Service {
+        uint id;
         string title;
         string description;
         string image;
@@ -37,17 +40,21 @@ contract GigEService {
     }
     
     function createService(string _title, string _description, string _image, string _category, string _subcategory, uint _price) public {
-        services[idNumber] = Service({title: _title, description: _description, image: _image, category: _category, subcategory: _subcategory, price: _price, seller: msg.sender});
+        services[idNumber] = Service({id: idNumber, title: _title, description: _description, image: _image, category: _category, subcategory: _subcategory, price: _price, seller: msg.sender});
         sellers[idNumber] = msg.sender;
         serviceList.push(idNumber);
+        emit Created(idNumber);
         idNumber = idNumber + 1;
-    
     }
     
     function buyService(uint _serviceId) public payable {
         Service memory _service = services[_serviceId];
         require(msg.value >= _service.price);
         orders[orderNumber] = Order({id: orderNumber, serviceId: _serviceId, amount: _service.price, seller: _service.seller, buyer: msg.sender});
+    }
+
+    function getServices() public view returns(uint[]) {
+        return serviceList;
     }
     
 }
