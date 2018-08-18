@@ -1,7 +1,19 @@
 {
   "rules": {
-    "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }],
+    "react/jsx-filename-extension": [
+      1,
+      {
+        "extensions": [
+          ".js",
+          ".jsx"
+        ]
+      }
+    ],
     "jsx-a11y/href-no-hash": "off",
+    "react/destructuring-assignment": [
+      0,
+      "never"
+    ],
     "indent": [
       2,
       2,
@@ -16,21 +28,38 @@
         "named": "never"
       }
     ],
-    "no-use-before-define": [2, "nofunc"],
-    "comma-dangle": [0],
+    "no-use-before-define": [
+      2,
+      "nofunc"
+    ],
+    "comma-dangle": [
+      0
+    ],
     "import/no-extraneous-dependencies": [
       "error",
       {
         "devDependencies": true
       }
     ],
-    "no-underscore-dangle": [0],
+    "no-underscore-dangle": [
+      0
+    ],
     "jsx-a11y/anchor-is-valid": [
       "error",
       {
-        "components": ["Link"],
-        "specialLink": ["to", "hrefLeft", "hrefRight"],
-        "aspects": ["noHref", "invalidHref", "preferButton"]
+        "components": [
+          "Link"
+        ],
+        "specialLink": [
+          "to",
+          "hrefLeft",
+          "hrefRight"
+        ],
+        "aspects": [
+          "noHref",
+          "invalidHref",
+          "preferButton"
+        ]
       }
     ]
   },
@@ -45,6 +74,12 @@
     "ecmaVersion": 6,
     "sourceType": "module"
   },
-  "plugins": ["jsx-a11y"],
-  "extends": ["eslint:recommended", "airbnb", "plugin:jsx-a11y/recommended"]
+  "plugins": [
+    "jsx-a11y"
+  ],
+  "extends": [
+    "eslint:recommended",
+    "airbnb",
+    "plugin:jsx-a11y/recommended"
+  ]
 }

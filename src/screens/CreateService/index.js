@@ -13,6 +13,8 @@ import Typography from '@material-ui/core/Typography';
 import withStyles from '@material-ui/core/styles/withStyles';
 import InputAdornment from '@material-ui/core/InputAdornment';
 
+import createService from '../../actions/service';
+
 const styles = theme => ({
   layout: {
     width: 'auto',
@@ -29,7 +31,8 @@ const styles = theme => ({
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    padding: `${theme.spacing.unit * 2}px ${theme.spacing.unit * 3}px ${theme.spacing.unit * 3}px`
+    padding: `${theme.spacing.unit * 2}px ${theme.spacing.unit * 3}px ${theme
+      .spacing.unit * 3}px`
   },
   avatar: {
     margin: theme.spacing.unit,
@@ -62,54 +65,49 @@ class SignIn extends Component {
           console.log(error);
           console.log(event);
         })
-        .on('data', (event) => {
+        .on('data', event => {
           console.log(event); // same results as the optional callback above
         })
-        .on('changed', (event) => {
+        .on('changed', event => {
           console.log(event);
         })
         .on('error', console.error);
     }
   }
 
-  handleChange = (e) => {
+  handleChange = e => {
     this.setState({ [e.target.id]: e.target.value });
   };
 
-  createNewService = async (e) => {
+  createNewService = async e => {
     e.preventDefault();
-    try {
-      const { web3, instance } = this.props.contract;
-
-      if (this.props.contract && web3) {
-        const accounts = await web3.eth.getAccounts();
-        console.log(accounts[0]);
-        const from = accounts[0];
-        const {
-          title, description, image, category, subcategory, price
-        } = this.state;
-        const priceBN = new web3.utils.BN(price);
-        await instance.methods
-          .createService(
-            title,
-            description,
-            image,
-            category,
-            subcategory,
-            web3.utils.toWei(priceBN)
-          )
-          .send({ from, gas: 2100000 })
-          .on('transactionHash', transactionHash => console.log(transactionHash));
-      }
-    } catch (error) {
-      console.log(error);
-    }
+    const {
+      title,
+      description,
+      image,
+      category,
+      subcategory,
+      price
+    } = this.state;
+    this.props.createService(
+      title,
+      description,
+      image,
+      category,
+      subcategory,
+      price
+    );
   };
 
   render() {
     const { classes } = this.props;
     const {
-      title, description, image, category, subcategory, price
+      title,
+      description,
+      image,
+      category,
+      subcategory,
+      price
     } = this.state;
 
     return (
@@ -120,14 +118,10 @@ class SignIn extends Component {
             <Avatar className={classes.avatar}>
               <NewIcon />
             </Avatar>
-            <Typography variant="headline">
-Create Service
-            </Typography>
+            <Typography variant="headline">Create Service</Typography>
             <form className={classes.form} onSubmit={this.createNewService}>
               <FormControl margin="normal" required fullWidth>
-                <InputLabel htmlFor="title">
-Title
-                </InputLabel>
+                <InputLabel htmlFor="title">Title</InputLabel>
                 <Input
                   id="title"
                   name="title"
@@ -137,9 +131,7 @@ Title
                 />
               </FormControl>
               <FormControl margin="normal" required fullWidth>
-                <InputLabel htmlFor="description">
-Description
-                </InputLabel>
+                <InputLabel htmlFor="description">Description</InputLabel>
                 <Input
                   id="description"
                   name="description"
@@ -148,15 +140,16 @@ Description
                 />
               </FormControl>
               <FormControl margin="normal" required fullWidth>
-                <InputLabel htmlFor="image">
-Image
-                </InputLabel>
-                <Input id="image" name="image" value={image} onChange={this.handleChange} />
+                <InputLabel htmlFor="image">Image</InputLabel>
+                <Input
+                  id="image"
+                  name="image"
+                  value={image}
+                  onChange={this.handleChange}
+                />
               </FormControl>
               <FormControl margin="normal" required fullWidth>
-                <InputLabel htmlFor="category">
-Category
-                </InputLabel>
+                <InputLabel htmlFor="category">Category</InputLabel>
                 <Input
                   id="category"
                   name="category"
@@ -165,9 +158,7 @@ Category
                 />
               </FormControl>
               <FormControl margin="normal" required fullWidth>
-                <InputLabel htmlFor="subcategory">
-Subcategory
-                </InputLabel>
+                <InputLabel htmlFor="subcategory">Subcategory</InputLabel>
                 <Input
                   id="subcategory"
                   name="subcategory"
@@ -176,20 +167,16 @@ Subcategory
                 />
               </FormControl>
               <FormControl margin="normal" required fullWidth>
-                <InputLabel htmlFor="price">
-Price
-                </InputLabel>
+                <InputLabel htmlFor="price">Price</InputLabel>
                 <Input
                   id="price"
                   name="price"
                   type="number"
                   value={price}
                   onChange={this.handleChange}
-                  endAdornment={(
-                    <InputAdornment position="end">
-ETH
-                    </InputAdornment>
-                  )}
+                  endAdornment={
+                    <InputAdornment position="end">ETH</InputAdornment>
+                  }
                 />
               </FormControl>
               <Button
@@ -197,6 +184,10 @@ ETH
                 fullWidth
                 variant="raised"
                 color="primary"
+                disabled={
+                  this.props.service.service.transactionHash &&
+                  !this.props.service.ready
+                }
                 className={classes.submit}
               >
                 Create
@@ -210,14 +201,29 @@ ETH
 }
 
 SignIn.propTypes = {
-  classes: PropTypes.shape({}).isRequired
+  classes: PropTypes.shape({}).isRequired,
+  createService: PropTypes.func.isRequired,
+  contract: PropTypes.shape({
+    web3: PropTypes.object,
+    instance: PropTypes.object
+  }).isRequired,
+  service: PropTypes.shape({
+    service: PropTypes.object,
+    ready: PropTypes.bool
+  }).isRequired
 };
 
 const mapStateToProps = state => ({
-  contract: state.contract
+  contract: state.contract,
+  service: state.service
 });
 
-const mapDispatchToProps = dispatch => ({});
+const mapDispatchToProps = dispatch => ({
+  createService: (title, description, image, category, subcategory, pice) =>
+    dispatch(
+      createService(title, description, image, category, subcategory, pice)
+    )
+});
 
 export default connect(
   mapStateToProps,

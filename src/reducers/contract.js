@@ -13,7 +13,7 @@ const contractReducer = (state = defaultState, action) => {
       return {
         ...state,
         isLoading: true,
-        instance: state.contract || [],
+        instance: state.contract || {},
         web3: state.web3 || null,
         error: null
       };

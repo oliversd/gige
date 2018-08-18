@@ -5,6 +5,8 @@ import PropTypes from 'prop-types';
 import WarningIcon from '@material-ui/icons/WarningOutlined';
 
 import getContract, { setError } from '../actions/contract';
+import { getServiceList } from '../actions/service';
+
 function WithAsyncWeb3(Component) {
   class Web3Component extends React.Component {
     componentWillMount() {
@@ -15,6 +17,7 @@ function WithAsyncWeb3(Component) {
 
     componentDidUpdate(prevProps) {
       if (!this.props.contract.web3 && !this.props.error) {
+        console.log('checking');
         this.checkContract();
       }
 
@@ -26,16 +29,7 @@ function WithAsyncWeb3(Component) {
       if (!contract) {
         console.log('There is no contract or web3 instance');
       } else {
-        this.props.contract.instance.events
-          .Created()
-          .on('data', event => {
-            console.log(event); // same results as the optional callback above
-          })
-          .on('changed', event => {
-            // remove event from local database
-            console.log(event);
-          })
-          .on('error', console.error);
+        this.props.getServiceList();
       }
     }
 
@@ -45,8 +39,9 @@ function WithAsyncWeb3(Component) {
           {this.props.error ? (
             <div style={{ width: '100%', textAlign: 'center' }}>
               <h3>
-                <WarningIcon style={{ position: 'relative', top: 5 }} /> Please check that you have
-                metamask installed and running or another Ethereum provider
+                <WarningIcon style={{ position: 'relative', top: 5 }} /> Please
+                check that you have metamask installed and running or another
+                Ethereum provider
               </h3>
             </div>
           ) : (
@@ -68,7 +63,8 @@ function WithAsyncWeb3(Component) {
 
   const mapDispatchToProps = dispatch => ({
     getContract: () => dispatch(getContract()),
-    setError: error => dispatch(setError(error))
+    setError: error => dispatch(setError(error)),
+    getServiceList: () => dispatch(getServiceList())
   });
 
   return connect(
