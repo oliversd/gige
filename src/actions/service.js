@@ -86,6 +86,23 @@ function serviceListSet(services) {
     services
   };
 }
+
+const getImageFromIPFS = async (imageHash) => {
+  try {
+    const image = await ipfs.get(
+      imageHash || 'QmVMvGBPLLTzohipnh5WGUB3aBysa8mwLHfTMdaUxsqQzj'
+    );
+
+    const blob = new Blob([image[0].content], { type: 'image/jpeg' });
+    const urlCreator = window.URL || window.webkitURL;
+    const imageUrl = urlCreator.createObjectURL(blob);
+    return imageUrl;
+  } catch (e) {
+    console.log(e);
+    throw Error('Problem getting image from IPFS', e);
+  }
+};
+
 /**
  * Get service data from IPFS
  * @param {32} bytes hash
@@ -116,11 +133,13 @@ const getAllServices = async (services, instance, from) => {
         category,
         subcategory
       } = await getServiceData(data);
+      const imageFromIPFS = await getImageFromIPFS(image);
+
       const resultService = {
         id,
         title,
         description,
-        image,
+        image: imageFromIPFS,
         category,
         subcategory,
         price,

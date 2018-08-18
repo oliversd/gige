@@ -52,7 +52,7 @@ class CreateService extends Component {
   state = {
     title: '',
     description: '',
-    image: 'fake.png',
+    image: null,
     category: '',
     subcategory: '',
     price: 0
@@ -62,8 +62,25 @@ class CreateService extends Component {
     this.setState({ [e.target.id]: e.target.value });
   };
 
+  captureFile = (event) => {
+    event.stopPropagation();
+    event.preventDefault();
+    const file = event.target.files[0];
+    const reader = new window.FileReader();
+    reader.readAsArrayBuffer(file);
+    reader.onloadend = () => this.convertToBuffer(reader);
+  };
+
+  convertToBuffer = async (reader) => {
+    // file is converted to a buffer for upload to IPFS
+    const image = await Buffer.from(reader.result);
+    // set this buffer -using es6 syntax
+    this.setState({ image });
+  };
+
   createNewService = async (e) => {
     e.preventDefault();
+
     const {
       title,
       description,
@@ -73,16 +90,17 @@ class CreateService extends Component {
       price
     } = this.state;
 
-    const doc = Buffer.from(
-      JSON.stringify({
-        title,
-        description,
-        image,
-        category,
-        subcategory
-      })
-    );
     try {
+      const imageHash = await ipfs.add(image);
+      const doc = Buffer.from(
+        JSON.stringify({
+          title,
+          description,
+          image: imageHash[0].hash,
+          category,
+          subcategory
+        })
+      );
       const ipfsHash = await ipfs.add(doc);
       if (ipfsHash) {
         const data = ipfsUtils.ipfsHashto32Bytes(ipfsHash[0].hash);
@@ -96,12 +114,7 @@ class CreateService extends Component {
   render() {
     const { classes } = this.props;
     const {
-      title,
-      description,
-      image,
-      category,
-      subcategory,
-      price
+      title, description, category, subcategory, price
     } = this.state;
 
     return (
@@ -113,7 +126,11 @@ class CreateService extends Component {
               <NewIcon />
             </Avatar>
             <Typography variant="headline">Create Service</Typography>
-            <form className={classes.form} onSubmit={this.createNewService}>
+            <form
+              className={classes.form}
+              onSubmit={this.createNewService}
+              encType="multipart/form-data"
+            >
               <FormControl margin="normal" required fullWidth>
                 <InputLabel htmlFor="title">Title</InputLabel>
                 <Input
@@ -134,13 +151,25 @@ class CreateService extends Component {
                 />
               </FormControl>
               <FormControl margin="normal" required fullWidth>
-                <InputLabel htmlFor="image">Image</InputLabel>
-                <Input
-                  id="image"
-                  name="image"
-                  value={image}
-                  onChange={this.handleChange}
-                />
+                <label htmlFor="files">
+                  <input
+                    accept="image/*"
+                    id="files"
+                    name="files"
+                    multiple
+                    type="file"
+                    onChange={this.captureFile}
+                    style={{ display: 'none' }}
+                  />
+                  <Button
+                    fullWidth
+                    variant="raised"
+                    color={this.state.image ? 'secondary' : 'primary'}
+                    component="span"
+                  >
+                    Upload Image
+                  </Button>
+                </label>
               </FormControl>
               <FormControl margin="normal" required fullWidth>
                 <InputLabel htmlFor="category">Category</InputLabel>
