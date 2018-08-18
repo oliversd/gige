@@ -1,7 +1,7 @@
 import Web3 from 'web3';
 import { contractActions } from '../config/actions';
 import GigEService from '../contracts/GigEService.json';
-import { serviceSetReady } from './service';
+import { serviceSetReady, getServiceList } from './service';
 
 function contractIsLoading() {
   return {
@@ -29,7 +29,7 @@ const instantiateContract = async (web3) => {
   try {
     const contractInstance = new web3.eth.Contract(
       GigEService.abi,
-      '0x967a860abe64eb108a1664abde6e464c5f7cb358'
+      '0x5496c4956b1e09aa9443f7fe547edbe8081b455b'
     );
     console.log(contractInstance);
     return contractInstance;
@@ -51,6 +51,7 @@ const setEvents = contractInstance => (dispatch) => {
     .on('data', (event) => {
       console.log(event);
       dispatch(serviceSetReady());
+      dispatch(getServiceList());
     })
     .on('changed', (event) => {
       // remove event from local database
