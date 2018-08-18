@@ -2,8 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { withRouter } from 'react-router-dom';
 
-import { lang } from '../../services/i18n/lang';
-import { getPath } from '../../services/i18n/utils';
+import { lang } from '../../utils/i18n/lang';
+import { getPath } from '../../utils/i18n/utils';
 
 import './style.css';
 

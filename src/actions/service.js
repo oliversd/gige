@@ -1,4 +1,6 @@
 import { serviceActions } from '../config/actions';
+import ipfs from '../utils/ipfs';
+import ipfsUtils from '../utils/ipfs-utils';
 
 function serviceIsLoading() {
   return {
@@ -29,21 +31,12 @@ function serviceReady() {
 }
 
 export function serviceSetReady() {
-  console.log('Hello');
   return (dispatch) => {
-    console.log('service ready');
     dispatch(serviceReady());
   };
 }
 
-export default function createService(
-  title,
-  description,
-  image,
-  category,
-  subcategory,
-  price
-) {
+export default function createService(price, data) {
   return async (dispatch, getState) => {
     dispatch(serviceIsLoading());
     const { contract } = getState();
@@ -55,14 +48,7 @@ export default function createService(
         const from = accounts[0];
         const priceBN = new web3.utils.BN(price);
         await instance.methods
-          .createService(
-            title,
-            description,
-            image,
-            category,
-            subcategory,
-            web3.utils.toWei(priceBN)
-          )
+          .createService(web3.utils.toWei(priceBN), data)
           .send({ from, gas: 2100000 })
           .on('transactionHash', (transactionHash) => {
             dispatch(serviceSet({ transactionHash }));
@@ -100,6 +86,19 @@ function serviceListSet(services) {
     services
   };
 }
+/**
+ * Get service data from IPFS
+ * @param {32} bytes hash
+ * @return {object}
+ */
+const getServiceData = async (hash) => {
+  try {
+    const serviceData = await ipfs.cat(ipfsUtils.ipfs32BytestoHash(hash));
+    return JSON.parse(serviceData);
+  } catch (e) {
+    throw Error("Can't get service data from IPFS", e);
+  }
+};
 
 const getAllServices = async (services, instance, from) => {
   const pArray = services.map(async (index) => {
@@ -107,8 +106,27 @@ const getAllServices = async (services, instance, from) => {
       const response = await instance.methods.services(index).call({ from });
       // FIX: REMOVE Result that affected response
       // check later
-      const test = { ...response };
-      return test;
+      const {
+        id, price, data, seller
+      } = response;
+      const {
+        title,
+        description,
+        image,
+        category,
+        subcategory
+      } = await getServiceData(data);
+      const resultService = {
+        id,
+        title,
+        description,
+        image,
+        category,
+        subcategory,
+        price,
+        seller
+      };
+      return resultService;
     } catch (e) {
       throw Error('Error fetching service', e);
     }

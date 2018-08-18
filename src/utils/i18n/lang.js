@@ -30,7 +30,7 @@ import { formatDate } from './utils';
  * @param {function(string)} onError
  */
 const initI18next = (opt, onSuccess, onError) => {
-  i18next.init(opt, err => {
+  i18next.init(opt, (err) => {
     if (err && onError) {
       onError(err);
     }
@@ -81,8 +81,7 @@ const lang = {
       }
     };
 
-    const fileUrlSchema =
-      opt.loadTranslationsFrom || DEFAULT_TRANSLATION_URL_SCHEMA;
+    const fileUrlSchema = opt.loadTranslationsFrom || DEFAULT_TRANSLATION_URL_SCHEMA;
     // we create the locale URL from the given locale option,
     // then we make an AJAX call to retrieve the translation
     // file. once it's loaded, we pass its JSON on to i18next
@@ -90,7 +89,7 @@ const lang = {
     return new Promise((resolve, reject) => {
       fetch(fileUrlSchema.replace(/{locale}/, locale))
         .then(response => response.json())
-        .then(responseJson => {
+        .then((responseJson) => {
           const resources = {};
           resources[locale] = responseJson;
 

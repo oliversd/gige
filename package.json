@@ -6,7 +6,9 @@
   "dependencies": {
     "@material-ui/core": "^1.4.3",
     "@material-ui/icons": "^2.0.1",
+    "bs58": "^4.0.1",
     "i18next": "^11.6.0",
+    "ipfs-api": "^24.0.0",
     "prop-types": "^15.6.2",
     "react": "^16.4.2",
     "react-dom": "^16.4.2",
@@ -40,8 +42,17 @@
     "stylelint-config-standard": "^18.2.0"
   },
   "lint-staged": {
-    "src/**/*.{js,jsx}": ["eslint --fix", "git add"],
-    "src/**/*.{css}": ["stylelint --fix", "git add"],
-    "src/**/*.{js,jsx,json,css}": ["prettier --single-quote --write", "git add"]
+    "src/**/*.{js,jsx}": [
+      "eslint --fix",
+      "git add"
+    ],
+    "src/**/*.{css}": [
+      "stylelint --fix",
+      "git add"
+    ],
+    "src/**/*.{js,jsx,json,css}": [
+      "prettier --single-quote --write",
+      "git add"
+    ]
   }
 }

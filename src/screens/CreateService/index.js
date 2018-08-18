@@ -14,6 +14,8 @@ import withStyles from '@material-ui/core/styles/withStyles';
 import InputAdornment from '@material-ui/core/InputAdornment';
 
 import createService from '../../actions/service';
+import ipfs from '../../utils/ipfs';
+import ipfsUtils from '../../utils/ipfs-utils';
 
 const styles = theme => ({
   layout: {
@@ -46,7 +48,7 @@ const styles = theme => ({
   }
 });
 
-class SignIn extends Component {
+class CreateService extends Component {
   state = {
     title: '',
     description: '',
@@ -56,30 +58,11 @@ class SignIn extends Component {
     price: 0
   };
 
-  componentDidMount() {
-    const { web3, instance } = this.props.contract;
-    if (this.props.contract && web3 && instance && instance.options) {
-      console.log('EVENTOS');
-      instance.events
-        .Created((error, event) => {
-          console.log(error);
-          console.log(event);
-        })
-        .on('data', event => {
-          console.log(event); // same results as the optional callback above
-        })
-        .on('changed', event => {
-          console.log(event);
-        })
-        .on('error', console.error);
-    }
-  }
-
-  handleChange = e => {
+  handleChange = (e) => {
     this.setState({ [e.target.id]: e.target.value });
   };
 
-  createNewService = async e => {
+  createNewService = async (e) => {
     e.preventDefault();
     const {
       title,
@@ -89,14 +72,25 @@ class SignIn extends Component {
       subcategory,
       price
     } = this.state;
-    this.props.createService(
-      title,
-      description,
-      image,
-      category,
-      subcategory,
-      price
+
+    const doc = Buffer.from(
+      JSON.stringify({
+        title,
+        description,
+        image,
+        category,
+        subcategory
+      })
     );
+    try {
+      const ipfsHash = await ipfs.add(doc);
+      if (ipfsHash) {
+        const data = ipfsUtils.ipfsHashto32Bytes(ipfsHash[0].hash);
+        this.props.createService(price, data);
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   render() {
@@ -185,14 +179,22 @@ class SignIn extends Component {
                 variant="raised"
                 color="primary"
                 disabled={
-                  this.props.service.service.transactionHash &&
-                  !this.props.service.ready
+                  this.props.service.service.transactionHash
+                  && !this.props.service.ready
                 }
                 className={classes.submit}
               >
                 Create
               </Button>
             </form>
+            <Button
+              fullWidth
+              variant="raised"
+              color="secondary"
+              onClick={this.saveToIPFS}
+            >
+              IPFS
+            </Button>
           </Paper>
         </main>
       </React.Fragment>
@@ -200,7 +202,7 @@ class SignIn extends Component {
   }
 }
 
-SignIn.propTypes = {
+CreateService.propTypes = {
   classes: PropTypes.shape({}).isRequired,
   createService: PropTypes.func.isRequired,
   contract: PropTypes.shape({
@@ -219,13 +221,12 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  createService: (title, description, image, category, subcategory, pice) =>
-    dispatch(
-      createService(title, description, image, category, subcategory, pice)
-    )
+  createService: (title, description, image, category, subcategory, pice) => dispatch(
+    createService(title, description, image, category, subcategory, pice)
+  )
 });
 
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(withStyles(styles)(SignIn));
+)(withStyles(styles)(CreateService));

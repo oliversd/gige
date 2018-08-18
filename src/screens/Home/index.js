@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
-// import t from "../../services/i18n/lang";
+// import t from "../../utils/i18n/lang";
 
 // actions import
 // hoc import
@@ -13,20 +13,13 @@ import './style.css';
 
 const Home = ({ serviceList }) => (
   <div>
-    <h1>
-Services
-    </h1>
+    <h1>Services</h1>
     {serviceList
       && serviceList.data.map(service => (
         <div key={service.id}>
-          <p>
-            {service.title}
-          </p>
-          {service.description}
-          <p />
-          <p>
-            {service.price}
-          </p>
+          <p>{service.title}</p>
+          <p>{service.category}</p>
+          <p>{service.price}</p>
         </div>
       ))}
   </div>

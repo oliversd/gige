@@ -1,11 +1,11 @@
 /* eslint import/prefer-default-export: 0 */
-import { lang } from '../../services/i18n/lang';
+import { lang } from './lang';
 import { FALLBACK_LOCALE } from '../../config/i18n';
 
 export function formatDate(value, format, locale) {
   const options = {};
 
-  format.split(';').forEach(part => {
+  format.split(';').forEach((part) => {
     const [key, values] = part.split(':');
     options[key.trim()] = values.trim();
   });
@@ -27,7 +27,8 @@ export function formatDate(value, format, locale) {
 export function getPath(currentLang, pathname, nextLang) {
   if (currentLang === 'en' && nextLang !== 'en') {
     return `/${nextLang}${pathname}`;
-  } else if (nextLang === 'en') {
+  }
+  if (nextLang === 'en') {
     return pathname.substr(3);
   }
   return pathname;
