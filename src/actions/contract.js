@@ -29,9 +29,8 @@ const instantiateContract = async (web3) => {
   try {
     const contractInstance = new web3.eth.Contract(
       GigEService.abi,
-      '0x5496c4956b1e09aa9443f7fe547edbe8081b455b'
+      '0x34fb078f81715a64884d1bdeab066aafb90cd986'
     );
-    console.log(contractInstance);
     return contractInstance;
   } catch (error) {
     console.log(error);

@@ -11,13 +11,9 @@ contract GigEService {
     
     struct Service {
         uint id;
-        string title;
-        string description;
-        string image;
-        string category;
-        string subcategory;
         uint price;
         address seller;
+        bytes32 data;
     }
     
     struct Order {
@@ -39,8 +35,8 @@ contract GigEService {
         owner = msg.sender;    
     }
     
-    function createService(string _title, string _description, string _image, string _category, string _subcategory, uint _price) public {
-        services[idNumber] = Service({id: idNumber, title: _title, description: _description, image: _image, category: _category, subcategory: _subcategory, price: _price, seller: msg.sender});
+    function createService(uint _price, bytes32 _data) public {
+        services[idNumber] = Service({id: idNumber, data: _data, price: _price, seller: msg.sender});
         sellers[idNumber] = msg.sender;
         serviceList.push(idNumber);
         emit Created(idNumber);

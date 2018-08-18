@@ -14,6 +14,8 @@ import withStyles from '@material-ui/core/styles/withStyles';
 import InputAdornment from '@material-ui/core/InputAdornment';
 
 import createService from '../../actions/service';
+import ipfs from '../../utils/ipfs';
+import ipfsUtils from '../../utils/ipfs-utils';
 
 const styles = theme => ({
   layout: {
@@ -46,41 +48,39 @@ const styles = theme => ({
   }
 });
 
-class SignIn extends Component {
+class CreateService extends Component {
   state = {
     title: '',
     description: '',
-    image: 'fake.png',
+    image: null,
     category: '',
     subcategory: '',
     price: 0
   };
 
-  componentDidMount() {
-    const { web3, instance } = this.props.contract;
-    if (this.props.contract && web3 && instance && instance.options) {
-      console.log('EVENTOS');
-      instance.events
-        .Created((error, event) => {
-          console.log(error);
-          console.log(event);
-        })
-        .on('data', event => {
-          console.log(event); // same results as the optional callback above
-        })
-        .on('changed', event => {
-          console.log(event);
-        })
-        .on('error', console.error);
-    }
-  }
-
-  handleChange = e => {
+  handleChange = (e) => {
     this.setState({ [e.target.id]: e.target.value });
   };
 
-  createNewService = async e => {
+  captureFile = (event) => {
+    event.stopPropagation();
+    event.preventDefault();
+    const file = event.target.files[0];
+    const reader = new window.FileReader();
+    reader.readAsArrayBuffer(file);
+    reader.onloadend = () => this.convertToBuffer(reader);
+  };
+
+  convertToBuffer = async (reader) => {
+    // file is converted to a buffer for upload to IPFS
+    const image = await Buffer.from(reader.result);
+    // set this buffer -using es6 syntax
+    this.setState({ image });
+  };
+
+  createNewService = async (e) => {
     e.preventDefault();
+
     const {
       title,
       description,
@@ -89,25 +89,32 @@ class SignIn extends Component {
       subcategory,
       price
     } = this.state;
-    this.props.createService(
-      title,
-      description,
-      image,
-      category,
-      subcategory,
-      price
-    );
+
+    try {
+      const imageHash = await ipfs.add(image);
+      const doc = Buffer.from(
+        JSON.stringify({
+          title,
+          description,
+          image: imageHash[0].hash,
+          category,
+          subcategory
+        })
+      );
+      const ipfsHash = await ipfs.add(doc);
+      if (ipfsHash) {
+        const data = ipfsUtils.ipfsHashto32Bytes(ipfsHash[0].hash);
+        this.props.createService(price, data);
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   render() {
     const { classes } = this.props;
     const {
-      title,
-      description,
-      image,
-      category,
-      subcategory,
-      price
+      title, description, category, subcategory, price
     } = this.state;
 
     return (
@@ -119,7 +126,11 @@ class SignIn extends Component {
               <NewIcon />
             </Avatar>
             <Typography variant="headline">Create Service</Typography>
-            <form className={classes.form} onSubmit={this.createNewService}>
+            <form
+              className={classes.form}
+              onSubmit={this.createNewService}
+              encType="multipart/form-data"
+            >
               <FormControl margin="normal" required fullWidth>
                 <InputLabel htmlFor="title">Title</InputLabel>
                 <Input
@@ -140,13 +151,25 @@ class SignIn extends Component {
                 />
               </FormControl>
               <FormControl margin="normal" required fullWidth>
-                <InputLabel htmlFor="image">Image</InputLabel>
-                <Input
-                  id="image"
-                  name="image"
-                  value={image}
-                  onChange={this.handleChange}
-                />
+                <label htmlFor="files">
+                  <input
+                    accept="image/*"
+                    id="files"
+                    name="files"
+                    multiple
+                    type="file"
+                    onChange={this.captureFile}
+                    style={{ display: 'none' }}
+                  />
+                  <Button
+                    fullWidth
+                    variant="raised"
+                    color={this.state.image ? 'secondary' : 'primary'}
+                    component="span"
+                  >
+                    Upload Image
+                  </Button>
+                </label>
               </FormControl>
               <FormControl margin="normal" required fullWidth>
                 <InputLabel htmlFor="category">Category</InputLabel>
@@ -185,14 +208,22 @@ class SignIn extends Component {
                 variant="raised"
                 color="primary"
                 disabled={
-                  this.props.service.service.transactionHash &&
-                  !this.props.service.ready
+                  this.props.service.service.transactionHash
+                  && !this.props.service.ready
                 }
                 className={classes.submit}
               >
                 Create
               </Button>
             </form>
+            <Button
+              fullWidth
+              variant="raised"
+              color="secondary"
+              onClick={this.saveToIPFS}
+            >
+              IPFS
+            </Button>
           </Paper>
         </main>
       </React.Fragment>
@@ -200,7 +231,7 @@ class SignIn extends Component {
   }
 }
 
-SignIn.propTypes = {
+CreateService.propTypes = {
   classes: PropTypes.shape({}).isRequired,
   createService: PropTypes.func.isRequired,
   contract: PropTypes.shape({
@@ -219,13 +250,12 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  createService: (title, description, image, category, subcategory, pice) =>
-    dispatch(
-      createService(title, description, image, category, subcategory, pice)
-    )
+  createService: (title, description, image, category, subcategory, pice) => dispatch(
+    createService(title, description, image, category, subcategory, pice)
+  )
 });
 
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(withStyles(styles)(SignIn));
+)(withStyles(styles)(CreateService));
