@@ -178,6 +178,17 @@ class CreateService extends Component {
       errorSet = true;
     }
 
+    if (
+      price
+      && (Number(price) > 1000 || Number(price) < 0.000000000000000001)
+    ) {
+      errors = {
+        ...errors,
+        price: 'Price is out of range 0.000000000000000001 to 1000'
+      };
+      errorSet = true;
+    }
+
     if (errorSet) {
       this.setState({ error: errors });
       return false;
@@ -414,7 +425,6 @@ class CreateService extends Component {
               && !this.props.service.ready && (
               <p className={classes.transactionWait}>
                   We are creating your service please wait. Transaction:
-                {' '}
                 {this.props.service.service.transactionHash}
               </p>
             )}
@@ -424,7 +434,6 @@ class CreateService extends Component {
               && this.props.service.ready && (
               <p className={classes.transactionReady}>
                   Your service is ready!. Transaction:
-                {' '}
                 {this.props.service.service.transactionHash}
               </p>
             )}
