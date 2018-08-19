@@ -15,7 +15,7 @@ import ServiceCard from '../../components/ServiceCard';
 
 import './style.css';
 
-const Home = ({ serviceList }) => (
+const Home = ({ serviceList, contract }) => (
   <div>
     <h1>
       Services
@@ -37,6 +37,7 @@ const Home = ({ serviceList }) => (
               title={service.title}
               image={service.image}
               description={service.description}
+              price={contract.web3.utils.fromWei(service.price, 'ether')}
             />
           </Grid>
         ))}
@@ -47,6 +48,9 @@ const Home = ({ serviceList }) => (
 Home.propTypes = {
   serviceList: PropTypes.shape({
     data: PropTypes.array
+  }).isRequired,
+  contract: PropTypes.shape({
+    web3: PropTypes.object
   }).isRequired
 };
 

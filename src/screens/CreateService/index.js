@@ -55,6 +55,24 @@ const styles = theme => ({
     '&:hover': {
       backgroundColor: red[700]
     }
+  },
+  transactionReady: {
+    display: 'block',
+    width: '100%',
+    wordWrap: 'break-word',
+    fontSize: '0.9rem',
+    background: theme.palette.secondary.light,
+    padding: 20,
+    color: '#fff'
+  },
+  transactionWait: {
+    display: 'block',
+    width: '100%',
+    wordWrap: 'break-word',
+    fontSize: '0.9rem',
+    background: theme.palette.primary.light,
+    padding: 20,
+    color: '#333'
   }
 });
 
@@ -391,6 +409,25 @@ class CreateService extends Component {
                 Create
               </Button>
             </form>
+            {this.props.service
+              && this.props.service.service.transactionHash
+              && !this.props.service.ready && (
+              <p className={classes.transactionWait}>
+                  We are creating your service please wait. Transaction:
+                {' '}
+                {this.props.service.service.transactionHash}
+              </p>
+            )}
+
+            {this.props.service
+              && this.props.service.service.transactionHash
+              && this.props.service.ready && (
+              <p className={classes.transactionReady}>
+                  Your service is ready!. Transaction:
+                {' '}
+                {this.props.service.service.transactionHash}
+              </p>
+            )}
           </Paper>
         </main>
       </React.Fragment>

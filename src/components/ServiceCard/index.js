@@ -7,7 +7,9 @@ import CardMedia from '@material-ui/core/CardMedia';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 
-const ServiceCard = ({ title, image, description }) => (
+const ServiceCard = ({
+  title, image, description, price
+}) => (
   <React.Fragment>
     <Card>
       <CardMedia image={image} title={title} className="media" />
@@ -21,6 +23,11 @@ const ServiceCard = ({ title, image, description }) => (
         <Button size="small" variant="raised" color="primary">
           More info
         </Button>
+        <div style={{ width: '72%', textAlign: 'right' }}>
+          <Typography variant="display1" component="p">
+            {`${price} ETH`}
+          </Typography>
+        </div>
       </CardActions>
     </Card>
   </React.Fragment>
@@ -29,7 +36,8 @@ const ServiceCard = ({ title, image, description }) => (
 ServiceCard.propTypes = {
   title: PropTypes.string.isRequired,
   image: PropTypes.string.isRequired,
-  description: PropTypes.string.isRequired
+  description: PropTypes.string.isRequired,
+  price: PropTypes.string.isRequired
 };
 
 export default ServiceCard;
