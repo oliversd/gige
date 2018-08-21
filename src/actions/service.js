@@ -46,9 +46,12 @@ export default function createService(price, data) {
         const { web3, instance } = contract;
         const accounts = await web3.eth.getAccounts();
         const from = accounts[0];
-        const priceBN = new web3.utils.BN(price);
+
+        // BN not working with decimals i.e: 0.5
+        // const priceBN = new web3.utils.BN(price.toString());
+
         await instance.methods
-          .createService(web3.utils.toWei(priceBN), data)
+          .createService(web3.utils.toWei(price.toString()), data)
           .send({ from, gas: 2100000 })
           .on('transactionHash', (transactionHash) => {
             dispatch(serviceSet({ transactionHash }));

@@ -7,6 +7,7 @@ import TopBar from './components/TopBar';
 
 import Home from './screens/Home';
 import CreateService from './screens/CreateService';
+import SingleService from './screens/SingleService';
 import NotFound from './screens/NotFound';
 
 const App = () => (
@@ -18,8 +19,22 @@ const App = () => (
           {/* keep the /:lang? optional argument for internationalization in all routes */}
           <Route exact path="/" component={withAsyncWeb3(Home)} />
           <Route exact path="/:lang?" component={Home} />
-          <Route exact path="/service/create" component={withAsyncWeb3(CreateService)} />
-          <Route exact path="/:lang?/service/create" component={CreateService} />
+          <Route
+            exact
+            path="/service/create"
+            component={withAsyncWeb3(CreateService)}
+          />
+          <Route
+            exact
+            path="/:lang?/service/create"
+            component={CreateService}
+          />
+          <Route
+            exact
+            path="/service/:id"
+            component={withAsyncWeb3(SingleService)}
+          />
+          <Route exact path="/:lang?/service/:id" component={SingleService} />
           <Route component={NotFound} />
         </Switch>
       </div>
