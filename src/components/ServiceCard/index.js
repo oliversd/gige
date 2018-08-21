@@ -6,22 +6,39 @@ import CardContent from '@material-ui/core/CardContent';
 import CardMedia from '@material-ui/core/CardMedia';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
+import { Link } from 'react-router-dom';
 
 const ServiceCard = ({
-  title, image, description, price
+  title,
+  image,
+  description,
+  price,
+  buttonText,
+  link
 }) => (
   <React.Fragment>
     <Card>
       <CardMedia image={image} title={title} className="media" />
       <CardContent>
-        <Typography gutterBottom variant="headline" component="h2">
+        <Typography
+          gutterBottom
+          variant="headline"
+          component="h2"
+          style={{ fontSize: '1.2rem' }}
+        >
           {title}
         </Typography>
         <Typography component="p">{description}</Typography>
       </CardContent>
       <CardActions>
-        <Button size="small" variant="raised" color="primary">
-          More info
+        <Button
+          component={Link}
+          to={link}
+          size="small"
+          variant="raised"
+          color="primary"
+        >
+          {buttonText}
         </Button>
         <div style={{ width: '72%', textAlign: 'right' }}>
           <Typography variant="display1" component="p">
@@ -37,7 +54,14 @@ ServiceCard.propTypes = {
   title: PropTypes.string.isRequired,
   image: PropTypes.string.isRequired,
   description: PropTypes.string.isRequired,
-  price: PropTypes.string.isRequired
+  price: PropTypes.string.isRequired,
+  buttonText: PropTypes.string,
+  link: PropTypes.string
+};
+
+ServiceCard.defaultProps = {
+  buttonText: 'More info',
+  link: '/'
 };
 
 export default ServiceCard;

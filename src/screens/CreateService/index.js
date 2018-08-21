@@ -98,7 +98,7 @@ class CreateService extends Component {
 
   handleChange = (e) => {
     if (e.target.id === 'description') {
-      const { max } = this.state.max;
+      const { max } = this.state;
       const text = e.target.value.substr(0, max);
       const descriptionLength = max - text.length;
       this.setState(prevState => ({
@@ -223,20 +223,20 @@ class CreateService extends Component {
           title: sanitizeHtml(title, {
             allowedTags: [],
             allowedAttributes: []
-          }),
+          }).trim(),
           description: sanitizeHtml(description, {
             allowedTags: [],
             allowedAttributes: []
-          }),
+          }).trim(),
           image: imageHash ? imageHash[0].hash : null,
           category: sanitizeHtml(category, {
             allowedTags: [],
             allowedAttributes: []
-          }),
+          }).trim(),
           subcategory: sanitizeHtml(subcategory, {
             allowedTags: [],
             allowedAttributes: []
-          })
+          }).trim()
         })
       );
       const ipfsHash = await ipfs.add(doc);

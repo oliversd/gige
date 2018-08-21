@@ -6,9 +6,7 @@ body {
   font-family: 'Noto Sans', sans-serif;
 }
 
-a,
-a:hover,
-a:visited {
+a {
   color: #333;
   text-decoration: none;
 }
