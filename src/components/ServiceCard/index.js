@@ -37,13 +37,12 @@ const ServiceCard = ({
           size="small"
           variant="raised"
           color="primary"
+          style={{ width: '30%' }}
         >
           {buttonText}
         </Button>
-        <div style={{ width: '72%', textAlign: 'right' }}>
-          <Typography variant="display1" component="p">
-            {`${price} ETH`}
-          </Typography>
+        <div style={{ width: '70%', textAlign: 'right' }}>
+          <Typography component="p">{`starting at ${price} ETH`}</Typography>
         </div>
       </CardActions>
     </Card>
