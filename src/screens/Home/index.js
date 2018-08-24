@@ -30,14 +30,17 @@ const Home = ({ serviceList, contract }) => (
       </Button>
     </h1>
     <Grid container spacing={24}>
-      {serviceList
-        && serviceList.data.map(service => (
+      {serviceList &&
+        serviceList.data.map(service => (
           <Grid key={service.id} item xs={12} sm={3}>
             <ServiceCard
               title={service.title}
               image={service.image}
               description={service.description.substr(0, 55)}
-              price={contract.web3.utils.fromWei(service.minimumPrice, 'ether')}
+              price={
+                contract &&
+                contract.web3.utils.fromWei(service.minimumPrice, 'ether')
+              }
               link={`/service/${service.id}`}
             />
           </Grid>

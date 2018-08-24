@@ -9,19 +9,34 @@ import { getServiceList } from '../actions/service';
 
 function WithAsyncWeb3(Component) {
   class Web3Component extends React.Component {
+    state = {
+      checkInterval: null,
+      retry: 0
+    };
+
     componentWillMount() {
       window.addEventListener('load', () => {
         this.checkContract();
       });
+      // Check for Ethereum provider every 5 seconds
+      const checkInterval = setInterval(this.checkContract.bind(this), 5000);
+      this.setState({ checkInterval });
     }
 
     componentDidUpdate(prevProps) {
-      if (!this.props.contract.web3 && !this.props.error) {
+      const { retry } = this.state;
+      if (!this.props.contract.web3 && !this.props.error && retry < 5) {
         console.log('checking');
         this.checkContract();
+        this.setState({ retry: retry + 1 });
       }
 
       return null;
+    }
+
+    componentWillUnmount() {
+      const { checkInterval } = this.state;
+      clearInterval(checkInterval);
     }
 
     async checkContract() {
