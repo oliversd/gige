@@ -160,8 +160,7 @@ const getAllServices = async (services, instance, from) => {
 
 export function getServiceList() {
   return async (dispatch, getState) => {
-    dispatch(serviceListIsLoading());
-    const { contract } = getState();
+    const { contract, serviceList } = getState();
 
     if (contract.web3 !== null && contract.instance !== null) {
       try {
@@ -169,11 +168,11 @@ export function getServiceList() {
         const accounts = await web3.eth.getAccounts();
         const from = accounts[0];
         const result = await instance.methods.getServices().call({ from });
-        if (result.length > 0) {
-          const serviceList = await getAllServices(result, instance, from);
-          dispatch(serviceListSet(serviceList));
-        } else {
-          dispatch(serviceListSet([]));
+
+        if (result.length > 0 && serviceList.data.length !== result.length) {
+          dispatch(serviceListIsLoading());
+          const list = await getAllServices(result, instance, from);
+          dispatch(serviceListSet(list));
         }
       } catch (e) {
         dispatch(serviceListError(e));

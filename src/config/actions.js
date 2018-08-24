@@ -8,7 +8,8 @@ export const dataActions = {
 export const contractActions = {
   CONTRACT_IS_LOADING: 'CONTRACT_IS_LOADING',
   CONTRACT_ERROR: 'CONTRACT_ERROR',
-  CONTRACT: 'CONTRACT'
+  CONTRACT: 'CONTRACT',
+  CONTRACT_SET_USER_ADDRESS: 'CONTRACT_SET_USER_ADDRESS'
 };
 
 export const serviceActions = {

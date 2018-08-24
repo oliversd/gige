@@ -4,6 +4,7 @@ const defaultState = {
   isLoading: null,
   instance: {},
   web3: {},
+  userAccount: null,
   error: null
 };
 
@@ -13,8 +14,9 @@ const contractReducer = (state = defaultState, action) => {
       return {
         ...state,
         isLoading: true,
-        instance: state.contract || {},
-        web3: state.web3 || null,
+        instance: { ...state.instance } || {},
+        web3: { ...state.web3 } || null,
+        userAccount: state.userAccount || null,
         error: null
       };
     case contractActions.CONTRACT_ERROR:
@@ -23,6 +25,7 @@ const contractReducer = (state = defaultState, action) => {
         isLoading: false,
         instance: [],
         web3: null,
+        userAccount: null,
         error: action.error
       };
     case contractActions.CONTRACT:
@@ -31,6 +34,7 @@ const contractReducer = (state = defaultState, action) => {
         isLoading: false,
         instance: action.contract,
         web3: action.web3,
+        userAccount: action.userAccount,
         error: null
       };
     default:

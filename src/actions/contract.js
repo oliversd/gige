@@ -17,11 +17,12 @@ function contractError(error) {
   };
 }
 
-function contractSet(contract, web3) {
+function contractSet(contract, web3, userAccount) {
   return {
     type: contractActions.CONTRACT,
     contract,
-    web3
+    web3,
+    userAccount
   };
 }
 
@@ -29,7 +30,7 @@ const instantiateContract = async (web3) => {
   try {
     const contractInstance = new web3.eth.Contract(
       GigEService.abi,
-      '0x17b6063c1729cdeba97fe644bd9a29f21df41c69'
+      '0x0f58069a749e7598939cd40ead9dd9c8ead853e9'
     );
     return contractInstance;
   } catch (error) {
@@ -61,10 +62,10 @@ const setEvents = contractInstance => (dispatch) => {
 
 export default function getContract() {
   // prettier disable-line
-  return async (dispatch) => {
-    dispatch(contractIsLoading());
-    const web3 = new Web3('ws://localhost:8545');
+  return async (dispatch, getState) => {
+    const { contract } = getState();
 
+    const web3 = new Web3('ws://localhost:8545');
     // Check for connection with metamask or localnetwork
     try {
       const network = await web3.eth.net.getNetworkType();
@@ -80,8 +81,18 @@ export default function getContract() {
     if (web3.currentProvider) {
       try {
         const ContractInstance = await instantiateContract(web3);
+        const accounts = await web3.eth.getAccounts();
+        const userAccount = accounts[0];
+        if (
+          contract
+          && contract.instance
+          && contract.instance._address === ContractInstance._address
+        ) {
+          return true;
+        }
+        dispatch(contractIsLoading());
         dispatch(setEvents(ContractInstance));
-        dispatch(contractSet(ContractInstance, web3));
+        dispatch(contractSet(ContractInstance, web3, userAccount));
         return true;
       } catch (error) {
         console.log(error);
