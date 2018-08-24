@@ -25,11 +25,11 @@ function contractSet(contract, web3) {
   };
 }
 
-const instantiateContract = async web3 => {
+const instantiateContract = async (web3) => {
   try {
     const contractInstance = new web3.eth.Contract(
       GigEService.abi,
-      '0x8846482335bd7175a1bd06072b681bb887e53484'
+      '0x17b6063c1729cdeba97fe644bd9a29f21df41c69'
     );
     return contractInstance;
   } catch (error) {
@@ -39,20 +39,20 @@ const instantiateContract = async web3 => {
 };
 
 export function setError(error) {
-  return dispatch => {
+  return (dispatch) => {
     dispatch(contractError(error));
   };
 }
 
-const setEvents = contractInstance => dispatch => {
+const setEvents = contractInstance => (dispatch) => {
   contractInstance.events
-    .Created()
-    .on('data', event => {
+    .ServiceCreated()
+    .on('data', (event) => {
       console.log(event);
       dispatch(serviceSetReady());
       dispatch(getServiceList());
     })
-    .on('changed', event => {
+    .on('changed', (event) => {
       // remove event from local database
       console.log(event);
     })
@@ -60,7 +60,8 @@ const setEvents = contractInstance => dispatch => {
 };
 
 export default function getContract() {
-  return async dispatch => {
+  // prettier disable-line
+  return async (dispatch) => {
     dispatch(contractIsLoading());
     const web3 = new Web3('ws://localhost:8545');
 

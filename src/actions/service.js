@@ -127,7 +127,7 @@ const getAllServices = async (services, instance, from) => {
       // FIX: REMOVE Result that affected response
       // check later
       const {
-        id, price, data, seller
+        id, minimumPrice, data, seller
       } = response;
       const {
         title,
@@ -145,7 +145,7 @@ const getAllServices = async (services, instance, from) => {
         image: imageFromIPFS,
         category,
         subcategory,
-        price,
+        minimumPrice,
         seller
       };
       return resultService;

@@ -14,8 +14,8 @@ const SingleService = ({ service, contract }) => (
             title={service.title}
             image={service.image}
             description={service.description}
-            price={contract.web3.utils.fromWei(service.price, 'ether')}
-            buttonText="Buy now"
+            price={contract.web3.utils.fromWei(service.minimumPrice, 'ether')}
+            buttonText="Get a quote"
           />
         </Grid>
       )}

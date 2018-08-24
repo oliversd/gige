@@ -37,7 +37,7 @@ const Home = ({ serviceList, contract }) => (
               title={service.title}
               image={service.image}
               description={service.description.substr(0, 55)}
-              price={contract.web3.utils.fromWei(service.price, 'ether')}
+              price={contract.web3.utils.fromWei(service.minimumPrice, 'ether')}
               link={`/service/${service.id}`}
             />
           </Grid>

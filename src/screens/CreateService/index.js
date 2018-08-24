@@ -391,7 +391,7 @@ class CreateService extends Component {
                 fullWidth
                 error={!!this.state.error.price}
               >
-                <InputLabel htmlFor="price">Price</InputLabel>
+                <InputLabel htmlFor="price">Starting Price</InputLabel>
                 <Input
                   id="price"
                   name="price"
