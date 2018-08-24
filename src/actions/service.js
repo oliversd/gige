@@ -31,7 +31,7 @@ function serviceReady() {
 }
 
 export function serviceSetReady() {
-  return (dispatch) => {
+  return dispatch => {
     dispatch(serviceReady());
   };
 }
@@ -53,7 +53,7 @@ export default function createService(price, data) {
         await instance.methods
           .createService(web3.utils.toWei(price.toString()), data)
           .send({ from, gas: 2100000 })
-          .on('transactionHash', (transactionHash) => {
+          .on('transactionHash', transactionHash => {
             dispatch(serviceSet({ transactionHash }));
           });
       } catch (error) {
@@ -90,7 +90,7 @@ function serviceListSet(services) {
   };
 }
 
-const getImageFromIPFS = async (imageHash) => {
+const getImageFromIPFS = async imageHash => {
   try {
     const image = await ipfs.get(
       imageHash || 'QmVMvGBPLLTzohipnh5WGUB3aBysa8mwLHfTMdaUxsqQzj'
@@ -108,11 +108,12 @@ const getImageFromIPFS = async (imageHash) => {
 
 /**
  * Get service data from IPFS
- * @param {32} bytes hash
+ * @param {bytes32} hash
  * @return {object}
  */
-const getServiceData = async (hash) => {
+const getServiceData = async hash => {
   try {
+    console.log(hash);
     const serviceData = await ipfs.cat(ipfsUtils.ipfs32BytestoHash(hash));
     return JSON.parse(serviceData);
   } catch (e) {
@@ -121,14 +122,13 @@ const getServiceData = async (hash) => {
 };
 
 const getAllServices = async (services, instance, from) => {
-  const pArray = services.map(async (index) => {
+  const pArray = services.map(async index => {
     try {
       const response = await instance.methods.services(index).call({ from });
       // FIX: REMOVE Result that affected response
       // check later
-      const {
-        id, minimumPrice, data, seller
-      } = response;
+      const { id, minimumPrice, data, seller } = response;
+      console.log(data);
       const {
         title,
         description,

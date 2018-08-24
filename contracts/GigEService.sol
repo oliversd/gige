@@ -58,11 +58,31 @@ contract GigEService is Destructible, Pausable {
     mapping (uint256 => Order) public orders;
 
 
+    modifier verifyCaller (address _address) {require (msg.sender == _address, "No authorized"); _;}
+
+    modifier paidEnough(uint256 _price) {require(msg.value >= _price, "Not sufficient funds"); _;}
+    modifier checkValue(uint256 _orderId) {
+        //refund them after pay for a order
+        _;
+        uint256 _price = orders[_orderId].price;
+        uint256 amountToRefund = msg.value - _price;
+        orders[_orderId].buyer.transfer(amountToRefund);
+    }
+
+    modifier isProposal(uint256 _orderId) {
+        require(orders[_orderId].state == OrderState.Proposal, "This order is not in a proposal state");
+        _;
+    }
+
     constructor() public {        
         serviceId = 0;
         orderId = 0;
     }
     
+    /**
+    * createService
+    * Create a new Service for the Store
+    */
     function createService(uint256 _minimumPrice, bytes32 _data) public {
         services[serviceId] = Service({id: serviceId, data: _data, minimumPrice: _minimumPrice, seller: msg.sender});
         sellers[serviceId] = msg.sender;
@@ -71,7 +91,11 @@ contract GigEService is Destructible, Pausable {
         serviceId = serviceId.add(1);
     }
     
-    function createOrder(uint256 _serviceId, uint256 _price, address _buyer) public {
+    /**
+    * createOrder
+    * The seller create a new Order proposal
+    */
+    function createOrder(uint256 _serviceId, uint256 _price, address _buyer) public verifyCaller(services[_serviceId].seller) {
         Service memory _service = services[_serviceId];
         orders[orderId] = Order({
             id: orderId,
@@ -81,11 +105,51 @@ contract GigEService is Destructible, Pausable {
             buyer: _buyer,
             state: OrderState.Proposal
         });
-        orderId = orderId.add(1);
+        emit OrderProposal(orderId);
+        orderId = orderId.add(1);        
+    }
+
+    /**
+    * acceptOrder
+    * The buyer accept the Order proposal
+    */
+    function acceptOrder(uint256 _orderId)
+        public
+        payable 
+        isProposal(_orderId)
+        verifyCaller(orders[_orderId].buyer)
+        checkValue(_orderId)
+    {
+        orders[_orderId].seller.transfer(orders[_orderId].price);
+        orders[_orderId].state = OrderState.Accepted;
+        emit OrderAccepted(_orderId);        
     }
 
     function getServices() public view returns(uint256[]) {
         return serviceList;
     }
-    
+
+    /* for test proupurse only */
+    function fetchService(uint256 _serviceId) public view returns (uint256 __serviceId, uint256 __price, bytes32 __data, address __seller) {
+        __serviceId = services[_serviceId].id;
+        __price = services[_serviceId].minimumPrice;
+        __seller = services[_serviceId].seller;
+        __data = services[_serviceId].data;
+        return (__serviceId, __price, __data, __seller);
+    }
+
+    /* for test proupurse only */
+    function fetchOrder(uint256 _orderId)
+        public 
+        view 
+        returns (uint256 __orderId, uint256 __serviceId, uint256 __price, address __seller, address __buyer, uint __state) 
+    {
+        __orderId = orders[_orderId].id;
+        __serviceId = orders[_orderId].serviceId;
+        __price = orders[_orderId].price;
+        __seller = orders[_orderId].seller;
+        __buyer = orders[_orderId].buyer;
+        __state = uint(orders[_orderId].state);
+        return (__orderId, __serviceId, __price, __seller, __buyer, __state);
+    }    
 }
