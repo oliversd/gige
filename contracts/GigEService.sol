@@ -1,7 +1,9 @@
 pragma solidity ^0.4.24;
 
+import 'zeppelin/contracts/lifecycle/Destructible.sol';
+import 'zeppelin/contracts/lifecycle/Pausable.sol';
 
-contract GigEService {
+contract GigEService is Destructible, Pausable {
     address private owner;
     uint public idNumber = 0;
     uint public orderNumber = 0;
@@ -30,10 +32,6 @@ contract GigEService {
     mapping (uint => address) public sellers; 
     // orderId => Order
     mapping (uint => Order) public orders;
-    
-    constructor() public {
-        owner = msg.sender;    
-    }
     
     function createService(uint _price, bytes32 _data) public {
         services[idNumber] = Service({id: idNumber, data: _data, price: _price, seller: msg.sender});
