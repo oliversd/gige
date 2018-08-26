@@ -146,7 +146,9 @@ class Quote extends Component {
   };
 
   render() {
-    const { service, contract, classes } = this.props;
+    const {
+      service, contract, classes, sellerOrders
+    } = this.props;
     const { price, buyer, error } = this.state;
     return (
       <div>
@@ -217,6 +219,9 @@ class Quote extends Component {
                     Create
                 </Button>
               </form>
+              {sellerOrders.map(order => (
+                <div>{order.buyer}</div>
+              ))}
             </Grid>
           </Grid>
         )}
@@ -237,6 +242,11 @@ Quote.propTypes = {
     description: PropTypes.string,
     price: PropTypes.string
   }),
+  sellerOrders: PropTypes.shape({
+    id: PropTypes.string,
+    service: PropTypes.object,
+    price: PropTypes.string
+  }).isRequired,
   createOrder: PropTypes.func.isRequired
 };
 
@@ -246,15 +256,22 @@ Quote.defaultProps = {
 
 const mapStateToProps = (state, props) => {
   let service = {};
+  let sellerOrders = [];
   if (state.serviceList.data.length > 0) {
     service = state.serviceList.data.filter(
       item => item.id === props.match.params.serviceId
     );
   }
+  if (state.orderList.sellerOrders.length > 0) {
+    sellerOrders = state.orderList.sellerOrders.filter(
+      order => order.serviceId === props.match.params.serviceId
+    );
+  }
   return {
     contract: state.contract,
     serviceList: state.serviceList,
-    service: service[0]
+    service: service[0],
+    sellerOrders
   };
 };
 

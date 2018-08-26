@@ -17,12 +17,14 @@ function contractError(error) {
   };
 }
 
-function contractSet(contract, web3, userAccount) {
+function contractSet(contract, web3, userAccount, network, accounts) {
   return {
     type: contractActions.CONTRACT,
     contract,
     web3,
-    userAccount
+    userAccount,
+    network,
+    accounts
   };
 }
 
@@ -77,15 +79,6 @@ export default function getContract() {
     const { contract } = getState();
 
     const web3 = new Web3('ws://localhost:8545');
-    // Check for connection with metamask or localnetwork
-    try {
-      const network = await web3.eth.net.getNetworkType();
-      console.log(network);
-    } catch (e) {
-      console.log(e);
-      dispatch(contractError(e.message));
-      return false;
-    }
 
     // currentProvider should return null if there is no provider
     // but right now is not working web3 1.0.0-beta.35
@@ -93,18 +86,29 @@ export default function getContract() {
       try {
         const ContractInstance = await instantiateContract(web3);
         const accounts = await web3.eth.getAccounts();
-        const userAccount = accounts[0];
-        console.log(accounts[1]);
+        const currentAccount = localStorage.getItem('GigE-account');
+        let userAccount = accounts[0];
+
+        // Check if the user has selected an account more for testing purposes
+        if (currentAccount && typeof accounts[currentAccount] !== 'undefined') {
+          userAccount = accounts[currentAccount];
+        }
+        console.log(userAccount);
         if (
           contract
           && contract.instance
           && contract.instance._address === ContractInstance._address
+          && contract.userAccount === userAccount
         ) {
           return true;
         }
+        const network = await web3.eth.net.getNetworkType();
+
         dispatch(contractIsLoading());
         dispatch(setEvents(ContractInstance));
-        dispatch(contractSet(ContractInstance, web3, userAccount));
+        dispatch(
+          contractSet(ContractInstance, web3, userAccount, network, accounts)
+        );
         return true;
       } catch (error) {
         console.log(error);

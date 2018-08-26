@@ -42,7 +42,13 @@ export default function createorder(serviceId, price, buyer) {
       try {
         const { web3, instance } = contract;
         const accounts = await web3.eth.getAccounts();
-        const from = accounts[0];
+        let from = accounts[0];
+        const currentAccount = localStorage.getItem('GigE-account');
+
+        // Check if the user has selected an account more for testing purposes
+        if (currentAccount && typeof accounts[currentAccount] !== 'undefined') {
+          from = accounts[currentAccount];
+        }
 
         // BN not working with decimals i.e: 0.5
         // const priceBN = new web3.utils.BN(price.toString());
@@ -88,19 +94,24 @@ function orderListSet(sellerOrders, buyerOrders) {
   };
 }
 
-const getAllOrders = async (orders, instance, from) => {
+const getAllOrders = async (orders, instance, from, serviceList) => {
   const pArray = orders.map(async (index) => {
     try {
       const response = await instance.methods.orders(index).call({ from });
       const {
-        serviceId, price, seller, buyer, state
+        id, serviceId, price, seller, buyer, state
       } = response;
+
+      const service = serviceList.filter(item => item.id === serviceId);
+
       return {
+        id,
         serviceId,
         price,
         seller,
         buyer,
-        state
+        state,
+        service: service[0]
       };
     } catch (e) {
       throw Error('Error fetching order', e);
@@ -112,13 +123,19 @@ const getAllOrders = async (orders, instance, from) => {
 
 export function getOrderList() {
   return async (dispatch, getState) => {
-    const { contract, orderList } = getState();
+    const { contract, orderList, serviceList } = getState();
 
     if (contract.web3 !== null && contract.instance !== null) {
       try {
         const { web3, instance } = contract;
         const accounts = await web3.eth.getAccounts();
-        const from = accounts[0];
+        let from = accounts[0];
+        const currentAccount = localStorage.getItem('GigE-account');
+
+        // Check if the user has selected an account more for testing purposes
+        if (currentAccount && typeof accounts[currentAccount] !== 'undefined') {
+          from = accounts[currentAccount];
+        }
         const sellerOrders = await instance.methods
           .getOrdersFromSeller(from)
           .call({ from });
@@ -126,13 +143,24 @@ export function getOrderList() {
           .getOrdersFromBuyer(from)
           .call({ from });
         if (
-          (sellerOrders.length > 0 || buyerOrders.length > 0)
+          serviceList.data.length > 0
+          && (sellerOrders.length > 0 || buyerOrders.length > 0)
           && (orderList.sellerOrders.length !== sellerOrders.length
             || orderList.buyerOrders.length !== buyerOrders.length)
         ) {
           dispatch(orderListIsLoading());
-          const listSeller = await getAllOrders(sellerOrders, instance, from);
-          const listBuyer = await getAllOrders(buyerOrders, instance, from);
+          const listSeller = await getAllOrders(
+            sellerOrders,
+            instance,
+            from,
+            serviceList.data
+          );
+          const listBuyer = await getAllOrders(
+            buyerOrders,
+            instance,
+            from,
+            serviceList.data
+          );
           dispatch(orderListSet(listSeller, listBuyer));
         }
       } catch (e) {

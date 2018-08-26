@@ -45,8 +45,13 @@ export default function createService(price, data) {
       try {
         const { web3, instance } = contract;
         const accounts = await web3.eth.getAccounts();
-        const from = accounts[0];
+        let from = accounts[0];
+        const currentAccount = localStorage.getItem('GigE-account');
 
+        // Check if the user has selected an account more for testing purposes
+        if (currentAccount && typeof accounts[currentAccount] !== 'undefined') {
+          from = accounts[currentAccount];
+        }
         // BN not working with decimals i.e: 0.5
         // const priceBN = new web3.utils.BN(price.toString());
 
@@ -166,7 +171,14 @@ export function getServiceList() {
       try {
         const { web3, instance } = contract;
         const accounts = await web3.eth.getAccounts();
-        const from = accounts[0];
+        let from = accounts[0];
+        const currentAccount = localStorage.getItem('GigE-account');
+
+        // Check if the user has selected an account more for testing purposes
+        if (currentAccount && typeof accounts[currentAccount] !== 'undefined') {
+          from = accounts[currentAccount];
+        }
+
         const result = await instance.methods.getServices().call({ from });
 
         if (result.length > 0 && serviceList.data.length !== result.length) {

@@ -18,9 +18,7 @@ import './style.css';
 const Home = ({ serviceList, contract }) => (
   <div>
     <h1>
-      Services - Your address is
-      {' '}
-      {contract.userAccount}
+      Services
       <Button
         component={Link}
         to="/service/create"

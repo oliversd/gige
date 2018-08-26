@@ -15,12 +15,12 @@ function WithAsyncWeb3(Component) {
       retry: 0
     };
 
-    componentWillMount() {
+    componentDidMount() {
       window.addEventListener('load', () => {
         this.checkContract();
       });
       // Check for Ethereum provider every 10 seconds
-      const checkInterval = setInterval(this.checkContract.bind(this), 10000);
+      const checkInterval = setInterval(this.checkContract.bind(this), 1000);
       this.setState({ checkInterval });
     }
 

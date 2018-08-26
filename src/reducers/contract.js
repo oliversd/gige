@@ -5,7 +5,9 @@ const defaultState = {
   instance: {},
   web3: {},
   userAccount: null,
-  error: null
+  error: null,
+  network: 'unavailable',
+  accounts: []
 };
 
 const contractReducer = (state = defaultState, action) => {
@@ -17,6 +19,8 @@ const contractReducer = (state = defaultState, action) => {
         instance: { ...state.instance } || {},
         web3: { ...state.web3 } || null,
         userAccount: state.userAccount || null,
+        network: state.network || 'unavailable',
+        accounts: state.accounts || [],
         error: null
       };
     case contractActions.CONTRACT_ERROR:
@@ -26,6 +30,8 @@ const contractReducer = (state = defaultState, action) => {
         instance: [],
         web3: null,
         userAccount: null,
+        network: 'unavailable',
+        accounts: [],
         error: action.error
       };
     case contractActions.CONTRACT:
@@ -35,6 +41,8 @@ const contractReducer = (state = defaultState, action) => {
         instance: action.contract,
         web3: action.web3,
         userAccount: action.userAccount,
+        network: action.network,
+        accounts: action.accounts,
         error: null
       };
     default:
