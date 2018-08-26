@@ -16,6 +16,7 @@ const SingleService = ({ service, contract }) => (
             description={service.description}
             price={contract.web3.utils.fromWei(service.minimumPrice, 'ether')}
             buttonText="Get a quote"
+            link={`/quote/create/${service.id}`}
           />
         </Grid>
       )}

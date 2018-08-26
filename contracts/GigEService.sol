@@ -10,6 +10,7 @@ contract GigEService is Destructible, Pausable {
     uint256 public serviceId;
     uint256 public orderId;
     uint256[] public serviceList;
+    uint256[] public orderList;
 
     /**
     * OrderState
@@ -56,7 +57,14 @@ contract GigEService is Destructible, Pausable {
     mapping (uint256 => address) public sellers; 
     // orderId => Order
     mapping (uint256 => Order) public orders;
+    // seller => orders Works well with few orders but
+    // this must be offchain
+    mapping (address => uint256[]) public sellerOrders;
 
+    // buyer => orders Works well with few orders but
+    // this must be offchain
+    mapping (address => uint256[]) public buyerOrders;
+    
 
     modifier verifyCaller (address _address) {require (msg.sender == _address, "No authorized"); _;}
 
@@ -104,9 +112,11 @@ contract GigEService is Destructible, Pausable {
             seller: _service.seller,
             buyer: _buyer,
             state: OrderState.Proposal
-        });
+        });    
+        sellerOrders[services[_serviceId].seller].push(orderId);
+        buyerOrders[_buyer].push(orderId);
         emit OrderProposal(orderId);
-        orderId = orderId.add(1);        
+        orderId = orderId.add(1);
     }
 
     /**
@@ -127,6 +137,14 @@ contract GigEService is Destructible, Pausable {
 
     function getServices() public view returns(uint256[]) {
         return serviceList;
+    }
+
+    function getOrdersFromSeller(address _seller) public returns(uint256[]){ 
+        return sellerOrders[_seller]; 
+    }
+
+    function getOrdersFromBuyer(address _buyer) public returns(uint256[]){ 
+        return buyerOrders[_buyer]; 
     }
 
     /* for test proupurse only */
@@ -151,5 +169,5 @@ contract GigEService is Destructible, Pausable {
         __buyer = orders[_orderId].buyer;
         __state = uint(orders[_orderId].state);
         return (__orderId, __serviceId, __price, __seller, __buyer, __state);
-    }    
+    }        
 }

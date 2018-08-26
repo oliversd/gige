@@ -6,6 +6,7 @@ import WarningIcon from '@material-ui/icons/WarningOutlined';
 
 import getContract, { setError } from '../actions/contract';
 import { getServiceList } from '../actions/service';
+import { getOrderList } from '../actions/order';
 
 function WithAsyncWeb3(Component) {
   class Web3Component extends React.Component {
@@ -18,14 +19,14 @@ function WithAsyncWeb3(Component) {
       window.addEventListener('load', () => {
         this.checkContract();
       });
-      // Check for Ethereum provider every 5 seconds
-      const checkInterval = setInterval(this.checkContract.bind(this), 5000);
+      // Check for Ethereum provider every 10 seconds
+      const checkInterval = setInterval(this.checkContract.bind(this), 10000);
       this.setState({ checkInterval });
     }
 
     componentDidUpdate(prevProps) {
       const { retry } = this.state;
-      if (!this.props.contract.web3 && !this.props.error && retry < 5) {
+      if (!this.props.contract.web3 && !this.props.error && retry < 10) {
         console.log('checking');
         this.checkContract();
         this.setState({ retry: retry + 1 });
@@ -45,6 +46,7 @@ function WithAsyncWeb3(Component) {
         console.log('There is no contract or web3 instance');
       } else {
         this.props.getServiceList();
+        this.props.getOrderList();
       }
     }
 
@@ -79,7 +81,8 @@ function WithAsyncWeb3(Component) {
   const mapDispatchToProps = dispatch => ({
     getContract: () => dispatch(getContract()),
     setError: error => dispatch(setError(error)),
-    getServiceList: () => dispatch(getServiceList())
+    getServiceList: () => dispatch(getServiceList()),
+    getOrderList: () => dispatch(getOrderList())
   });
 
   return connect(

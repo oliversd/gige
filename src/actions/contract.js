@@ -30,7 +30,7 @@ const instantiateContract = async (web3) => {
   try {
     const contractInstance = new web3.eth.Contract(
       GigEService.abi,
-      '0x0f58069a749e7598939cd40ead9dd9c8ead853e9'
+      '0x9a386d3cc0036b5c4d4030d61658b83b1f715e16'
     );
     return contractInstance;
   } catch (error) {
@@ -52,6 +52,17 @@ const setEvents = contractInstance => (dispatch) => {
       console.log(event);
       dispatch(serviceSetReady());
       dispatch(getServiceList());
+    })
+    .on('changed', (event) => {
+      // remove event from local database
+      console.log(event);
+    })
+    .on('error', console.error);
+
+  contractInstance.events
+    .OrderProposal()
+    .on('data', (event) => {
+      console.log(event);
     })
     .on('changed', (event) => {
       // remove event from local database
@@ -83,6 +94,7 @@ export default function getContract() {
         const ContractInstance = await instantiateContract(web3);
         const accounts = await web3.eth.getAccounts();
         const userAccount = accounts[0];
+        console.log(accounts[1]);
         if (
           contract
           && contract.instance

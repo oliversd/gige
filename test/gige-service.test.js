@@ -1,6 +1,6 @@
 const GigEService = artifacts.require('GigEService');
 
-contract('GigEService', (accounts) => {
+contract('GigEService', accounts => {
   const owner = accounts[0];
   const alice = accounts[1];
   const bob = accounts[2];
@@ -66,6 +66,8 @@ contract('GigEService', (accounts) => {
 
     const result = await service.fetchOrder.call(orderId);
 
+    const sellerOrders = await service.getOrdersFromSeller.call(alice, { from: alice });
+
     assert.equal(
       result[0],
       orderId,
@@ -85,9 +87,10 @@ contract('GigEService', (accounts) => {
     assert.equal(result[4], bob, 'the address of the buyer does not match the expected value');
     assert.equal(result[5].toString(10), 0, 'the state of the order should be Proposal');
     assert.equal(eventEmitted, true, 'adding an order should emit a ServiceCreated event');
+    assert.equal(sellerOrders.length, 1, 'sellerOrders length should be 1');
   });
 
-  it('should allow someone to accept and pay an order', async () => {
+  it('should allow the buyer to accept and pay an order', async () => {
     const service = await GigEService.deployed();
 
     let eventEmitted = false;

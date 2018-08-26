@@ -18,7 +18,9 @@ import './style.css';
 const Home = ({ serviceList, contract }) => (
   <div>
     <h1>
-      Services
+      Services - Your address is
+      {' '}
+      {contract.userAccount}
       <Button
         component={Link}
         to="/service/create"
@@ -30,16 +32,19 @@ const Home = ({ serviceList, contract }) => (
       </Button>
     </h1>
     <Grid container spacing={24}>
-      {serviceList &&
-        serviceList.data.map(service => (
+      {serviceList
+        && serviceList.data.map(service => (
           <Grid key={service.id} item xs={12} sm={3}>
+            {contract.userAccount === service.seller && 'Your service'}
             <ServiceCard
               title={service.title}
               image={service.image}
               description={service.description.substr(0, 55)}
               price={
-                contract &&
-                contract.web3.utils.fromWei(service.minimumPrice, 'ether')
+                contract
+                && contract.web3
+                && contract.web3.utils
+                && contract.web3.utils.fromWei(service.minimumPrice, 'ether')
               }
               link={`/service/${service.id}`}
             />
@@ -54,7 +59,8 @@ Home.propTypes = {
     data: PropTypes.array
   }).isRequired,
   contract: PropTypes.shape({
-    web3: PropTypes.object
+    web3: PropTypes.object,
+    userAccount: PropTypes.string
   }).isRequired
 };
 
