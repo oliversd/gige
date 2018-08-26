@@ -6,6 +6,7 @@ import Grid from '@material-ui/core/Grid';
 // import t from "../../utils/i18n/lang";
 import OrderState from '../../utils/order-utils';
 // actions import
+import { acceptOrder } from '../../actions/order';
 // hoc import
 // components import
 import OrderCard from '../../components/OrderCard';
@@ -14,52 +15,93 @@ import OrderCard from '../../components/OrderCard';
 import './style.css';
 
 class Orders extends Component {
-  handleClick = () => {
-    console.log('clicked');
+  handleClick = (orderId, state, price) => {
+    console.log('acceptOrder', state);
+    if (Number(state) === 0) {
+      console.log('acceptOrder', orderId);
+      this.props.acceptOrder(
+        orderId,
+        this.props.contract.web3.utils.toWei(price, 'ether')
+      );
+    }
+  };
+
+  getLabel = (state, type) => {
+    console.log(type);
+    if (type === 'seller') {
+      switch (Number(state)) {
+        case 1:
+          return 'Cancel service';
+        case 2:
+          return 'Mark as finished';
+        default:
+          return '';
+      }
+    }
+
+    if (type === 'buyer') {
+      switch (Number(state)) {
+        case 0:
+          return 'Pay Service';
+        case 4:
+          return 'Release payment';
+        default:
+          return '';
+      }
+    }
+    return '';
   };
 
   render() {
     return (
       <div>
         <h1>Orders</h1>
-        {this.props.orderList
-          && this.props.orderList.sellerOrders.length > 0 && <h2>Buy Orders</h2>}
+        {this.props.orderList &&
+          this.props.orderList.sellerOrders.length > 0 && <h2>Buy Orders</h2>}
         <Grid container spacing={24}>
-          {this.props.orderList
-            && this.props.orderList.sellerOrders.map(order => (
+          {this.props.orderList &&
+            this.props.orderList.sellerOrders.map(order => (
               <Grid key={order.id} item xs={12} sm={3}>
                 <OrderCard
                   title={order.service.title}
                   price={
-                    this.props.contract
-                    && this.props.contract.web3
-                    && this.props.contract.web3.utils
-                    && this.props.contract.web3.utils.fromWei(order.price, 'ether')
+                    this.props.contract &&
+                    this.props.contract.web3 &&
+                    this.props.contract.web3.utils &&
+                    this.props.contract.web3.utils.fromWei(order.price, 'ether')
                   }
                   id={order.id}
                   buyer={order.buyer}
+                  seller="You"
                   state={OrderState(order.state)}
+                  stateCode={order.state}
+                  buttonLabel={this.getLabel(order.state, 'seller')}
+                  handleClick={this.handleClick}
                 />
               </Grid>
             ))}
         </Grid>
-        {this.props.orderList
-          && this.props.orderList.buyerOrders.length > 0 && <h2>Sell Orders</h2>}
+        {this.props.orderList &&
+          this.props.orderList.buyerOrders.length > 0 && <h2>Sell Orders</h2>}
         <Grid container spacing={24}>
-          {this.props.orderList
-            && this.props.orderList.buyerOrders.map(order => (
+          {this.props.orderList &&
+            this.props.orderList.buyerOrders.map(order => (
               <Grid key={order.id} item xs={12} sm={3}>
                 <OrderCard
                   title={order.service.title}
                   price={
-                    this.props.contract
-                    && this.props.contract.web3
-                    && this.props.contract.web3.utils
-                    && this.props.contract.web3.utils.fromWei(order.price, 'ether')
+                    this.props.contract &&
+                    this.props.contract.web3 &&
+                    this.props.contract.web3.utils &&
+                    this.props.contract.web3.utils.fromWei(order.price, 'ether')
                   }
                   id={order.id}
-                  buyer={order.buyer}
+                  buyer="You"
+                  seller={order.seller}
                   state={OrderState(order.state)}
+                  stateCode={order.state}
+                  buttonLabel={this.getLabel(order.state, 'buyer')}
+                  handleClick={this.handleClick}
                 />
               </Grid>
             ))}
@@ -80,7 +122,8 @@ Orders.propTypes = {
   contract: PropTypes.shape({
     web3: PropTypes.object,
     userAccount: PropTypes.string
-  }).isRequired
+  }).isRequired,
+  acceptOrder: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => ({
@@ -89,4 +132,11 @@ const mapStateToProps = state => ({
   orderList: state.orderList
 });
 
-export default connect(mapStateToProps)(Orders);
+const mapDispatchToProps = dispatch => ({
+  acceptOrder: (orderId, price) => dispatch(acceptOrder(orderId, price))
+});
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(Orders);

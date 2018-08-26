@@ -2,42 +2,42 @@ import { orderActions } from '../config/actions';
 
 const defaultState = {
   isLoading: false,
-  order: {},
+  hash: '',
   ready: false,
   error: null
 };
 
-const orderReducer = (state = defaultState, action) => {
+const orderAcceptReducer = (state = defaultState, action) => {
   switch (action.type) {
-    case orderActions.ORDER_IS_LOADING:
+    case orderActions.ORDER_ACCEPT_IS_LOADING:
       return {
         ...state,
         isLoading: true,
-        order: state.order || {},
-        ready: state.ready || null,
+        hash: state.orderAccept || '',
+        ready: state.orderAccept || null,
         error: null
       };
-    case orderActions.ORDER_ERROR:
+    case orderActions.ORDER_ACCEPT_ERROR:
       return {
         ...state,
         isLoading: false,
-        order: [],
+        hash: [],
         ready: null,
         error: action.error
       };
-    case orderActions.ORDER_SET_READY:
+    case orderActions.ORDER_ACCEPT_SET_READY:
       return {
         ...state,
         isLoading: false,
-        order: state.order,
+        hash: state.orderAccept,
         ready: true,
         error: null
       };
-    case orderActions.ORDER:
+    case orderActions.ORDER_ACCEPT:
       return {
         ...state,
         isLoading: false,
-        order: action.order,
+        hash: action.hash,
         ready: false,
         error: null
       };
@@ -46,4 +46,4 @@ const orderReducer = (state = defaultState, action) => {
   }
 };
 
-export default orderReducer;
+export default orderAcceptReducer;

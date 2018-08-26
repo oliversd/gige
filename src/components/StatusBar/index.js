@@ -10,7 +10,7 @@ import './style.css';
 
 class StatusBar extends Component {
   state = {
-    show: true,
+    show: false,
     account: 0
   };
 
@@ -20,6 +20,9 @@ class StatusBar extends Component {
     if (currentAccount) {
       this.setState({ account: Number(currentAccount) });
     }
+    /* const show = localStorage.getItem('GigE-statusbar');
+    console.log(show);
+    this.setState({ show }); */
   }
 
   handleChange = (event) => {
@@ -28,7 +31,10 @@ class StatusBar extends Component {
   };
 
   toggleView = () => {
-    this.setState(prevState => ({ show: !prevState.show }));
+    this.setState((prevState) => {
+      localStorage.setItem('GigE-statusbar', !prevState.show);
+      return { show: !prevState.show };
+    });
   };
 
   render() {

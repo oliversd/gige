@@ -5,6 +5,7 @@ import service from './service';
 import order from './order';
 import serviceList from './serviceList';
 import orderList from './orderList';
+import orderAccept from './orderAccept';
 
 export default combineReducers({
   data,
@@ -12,5 +13,6 @@ export default combineReducers({
   service,
   serviceList,
   order,
-  orderList
+  orderList,
+  orderAccept
 });

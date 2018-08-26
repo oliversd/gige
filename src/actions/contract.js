@@ -2,6 +2,7 @@ import Web3 from 'web3';
 import { contractActions } from '../config/actions';
 import GigEService from '../contracts/GigEService.json';
 import { serviceSetReady, getServiceList } from './service';
+import contractConfig from '../config/contract';
 
 function contractIsLoading() {
   return {
@@ -32,7 +33,7 @@ const instantiateContract = async (web3) => {
   try {
     const contractInstance = new web3.eth.Contract(
       GigEService.abi,
-      '0x9a386d3cc0036b5c4d4030d61658b83b1f715e16'
+      contractConfig.address
     );
     return contractInstance;
   } catch (error) {
@@ -78,7 +79,7 @@ export default function getContract() {
   return async (dispatch, getState) => {
     const { contract } = getState();
 
-    const web3 = new Web3('ws://localhost:8545');
+    const web3 = new Web3(Web3.givenProvider || 'ws://localhost:8545');
 
     // currentProvider should return null if there is no provider
     // but right now is not working web3 1.0.0-beta.35
@@ -93,7 +94,7 @@ export default function getContract() {
         if (currentAccount && typeof accounts[currentAccount] !== 'undefined') {
           userAccount = accounts[currentAccount];
         }
-        console.log(userAccount);
+
         if (
           contract
           && contract.instance

@@ -33,7 +33,7 @@ export function orderSetReady() {
     dispatch(orderReady());
   };
 }
-export default function createorder(serviceId, price, buyer) {
+export default function createOrder(serviceId, price, buyer) {
   return async (dispatch, getState) => {
     dispatch(orderIsLoading());
     const { contract } = getState();
@@ -169,6 +169,88 @@ export function getOrderList() {
       }
     } else {
       dispatch(orderError('There is no Web3 instance'));
+    }
+  };
+}
+
+/**
+ * Order Accept
+ */
+function orderAcceptIsLoading() {
+  return {
+    type: orderActions.ORDER_ACCEPT_IS_LOADING,
+    isLoading: true
+  };
+}
+
+function orderAcceptError(error) {
+  return {
+    type: orderActions.ORDER_ACCEPT_ERROR,
+    error
+  };
+}
+
+function orderAcceptSet(hash) {
+  return {
+    type: orderActions.ORDER_ACCEPT,
+    hash
+  };
+}
+
+function orderAcceptReady() {
+  return {
+    type: orderActions.ORDER_ACCEPT_SET_READY,
+    ready: true
+  };
+}
+
+export function orderAcceptSetReady() {
+  return (dispatch) => {
+    dispatch(orderAcceptReady());
+  };
+}
+export function acceptOrder(orderId, price) {
+  return async (dispatch, getState) => {
+    dispatch(orderAcceptIsLoading());
+    const { contract } = getState();
+
+    if (contract.web3 !== null && contract.instance !== null) {
+      try {
+        const { web3, instance } = contract;
+        const accounts = await web3.eth.getAccounts();
+        let from = accounts[0];
+        const currentAccount = localStorage.getItem('GigE-account');
+
+        // Check if the user has selected an account more for testing purposes
+        if (currentAccount && typeof accounts[currentAccount] !== 'undefined') {
+          from = accounts[currentAccount];
+        }
+
+        // BN not working with decimals i.e: 0.5
+        // const priceBN = new web3.utils.BN(price.toString());
+
+        // suppose you want to call a function named myFunction of myContract
+        // const acceptOrderFunc = await instance.acceptOrder.getData(orderId);
+        // finally paas this data parameter to send Transaction
+        await instance.methods
+          .acceptOrder(orderId)
+          .send({ from, value: price })
+          .on('transactionHash', (transactionHash) => {
+            dispatch(orderAcceptSet({ transactionHash }));
+          })
+          .on('receipt', (receipt) => {
+            console.log(receipt);
+          })
+          .on('confirmation', (confirmationNumber, receipt) => {
+            console.log(receipt);
+            console.log(confirmationNumber);
+          })
+          .on('error', error => dispatch(orderAcceptError(error.message))); // If a out of gas error, the second parameter is the receipt.
+      } catch (error) {
+        dispatch(orderAcceptError(error.message));
+      }
+    } else {
+      dispatch(orderAcceptError('There is no Web3 instance'));
     }
   };
 }
