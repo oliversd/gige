@@ -1,14 +1,12 @@
 .status-bar {
-  position: fixed;
-  bottom: 0;
-  width: 93%;
+  text-align: right;
+  width: 98%;
   background: #d9e4cc;
   color: #333;
   padding: 20px;
 }
 
 .status-bar.collapsed {
-  width: 10%;
   background: none;
 }
 

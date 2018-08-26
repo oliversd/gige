@@ -25,6 +25,19 @@ class StatusBar extends Component {
     this.setState({ show }); */
   }
 
+  getEvents = () => {
+    if (this.props.contract && this.props.contract.instance) {
+      this.props.contract.instance
+        .getPastEvents('allEvents', {
+          fromBlock: 0,
+          toBlock: 'latest'
+        })
+        .then((events) => {
+          console.log(events); // same results as the optional callback above
+        });
+    }
+  };
+
   handleChange = (event) => {
     this.setState({ account: event.target.value });
     localStorage.setItem('GigE-account', event.target.value);
@@ -43,7 +56,9 @@ class StatusBar extends Component {
       <div className={show ? 'status-bar' : 'status-bar collapsed'}>
         {show && (
           <div>
-            <p>This is for testing purpose only</p>
+            <p>
+This is for testing purpose only
+            </p>
             <Chip
               label="Hide this"
               onDelete={this.toggleView}
@@ -52,15 +67,21 @@ class StatusBar extends Component {
             />
             <p>
               {`Current Network: ${this.props.contract
-              && this.props.contract.network}`}
+                && this.props.contract.network}`}
             </p>
             <p className="current-account">
               {`Current Account: ${this.props.contract
                 && this.props.contract.userAccount}`}
             </p>
+            <p className="current-account">
+              {`Current Network: ${this.props.contract
+                && this.props.contract.network}`}
+            </p>
             <form autoComplete="off">
               <FormControl>
-                <InputLabel htmlFor="account">Select account</InputLabel>
+                <InputLabel htmlFor="account">
+Select account
+                </InputLabel>
                 <Select
                   value={this.state.account}
                   onChange={this.handleChange}
@@ -79,6 +100,13 @@ class StatusBar extends Component {
                 </Select>
               </FormControl>
             </form>
+
+            <Chip
+              color="primary"
+              label="Get events (to console.log, be patient can take a couple of minutes)"
+              onClick={this.getEvents}
+              style={{ marginTop: 20 }}
+            />
           </div>
         )}
         {!show && (
@@ -92,6 +120,10 @@ class StatusBar extends Component {
               {`Current Account: ${this.props.contract
                 && this.props.contract.userAccount}`}
             </p>
+            <p className="current-account">
+              {`Current Network: ${this.props.contract
+                && this.props.contract.network}`}
+            </p>
           </div>
         )}
       </div>
@@ -102,6 +134,7 @@ class StatusBar extends Component {
 StatusBar.propTypes = {
   contract: PropTypes.shape({
     web3: PropTypes.object,
+    instance: PropTypes.object,
     userAccount: PropTypes.string,
     network: PropTypes.string,
     accounts: PropTypes.array

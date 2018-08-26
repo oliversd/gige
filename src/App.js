@@ -18,6 +18,7 @@ const App = () => (
     <div className="app">
       <TopBar />
       <div className="container">
+        <StatusBar />
         <Switch>
           {/* keep the /:lang? optional argument for internationalization in all routes */}
           <Route exact path="/" component={withAsyncWeb3(Home)} />
@@ -52,7 +53,6 @@ const App = () => (
           />
           <Route component={NotFound} />
         </Switch>
-        <StatusBar />
       </div>
     </div>
   </Router>

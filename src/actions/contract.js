@@ -48,11 +48,25 @@ export function setError(error) {
   };
 }
 
-const setEvents = contractInstance => (dispatch) => {
-  contractInstance.events
+const setEvents = () => (dispatch) => {
+  console.log('set events');
+  // We need ws to listen to events
+  const web3Events = new Web3('wss://rinkeby.infura.io/_ws');
+  const instance = new web3Events.eth.Contract(
+    GigEService.abi,
+    contractConfig.address
+  );
+  /* const subscription = web3Events.eth
+    .subscribe('pendingTransactions', (error, result) => {})
+    .on('data', (transactionHash) => {
+      web3Events.eth.getTransaction(transactionHash).then((transaction) => {
+        console.log(transaction);
+      });
+    }); */
+  instance.events
     .ServiceCreated()
     .on('data', (event) => {
-      console.log(event);
+      console.log('Created data', event);
       dispatch(serviceSetReady());
       dispatch(getServiceList());
     })
@@ -60,9 +74,9 @@ const setEvents = contractInstance => (dispatch) => {
       // remove event from local database
       console.log(event);
     })
-    .on('error', console.error);
+    .on('error', error => console.error(error));
 
-  contractInstance.events
+  instance.events
     .OrderProposal()
     .on('data', (event) => {
       console.log(event);
@@ -78,7 +92,6 @@ export default function getContract() {
   // prettier disable-line
   return async (dispatch, getState) => {
     const { contract } = getState();
-
     const web3 = new Web3(Web3.givenProvider || 'ws://localhost:8545');
 
     // currentProvider should return null if there is no provider
@@ -86,6 +99,7 @@ export default function getContract() {
     if (web3.currentProvider) {
       try {
         const ContractInstance = await instantiateContract(web3);
+
         const accounts = await web3.eth.getAccounts();
         const currentAccount = localStorage.getItem('GigE-account');
         let userAccount = accounts[0];
@@ -106,7 +120,7 @@ export default function getContract() {
         const network = await web3.eth.net.getNetworkType();
 
         dispatch(contractIsLoading());
-        dispatch(setEvents(ContractInstance));
+        dispatch(setEvents());
         dispatch(
           contractSet(ContractInstance, web3, userAccount, network, accounts)
         );

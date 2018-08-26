@@ -1,3 +1,3 @@
 export default {
-  address: '0x755c1af3a7a182fdd10fcb82468cce444afe698f'
+  address: '0x0113626b8bea23501fe19e442eac80bcb58324f0'
 };
