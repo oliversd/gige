@@ -165,7 +165,7 @@ export function getOrderList() {
         }
       } catch (e) {
         console.log(e);
-        dispatch(orderListError(e));
+        dispatch(orderListError(e.message));
       }
     } else {
       dispatch(orderError('There is no Web3 instance'));
@@ -241,9 +241,11 @@ export function acceptOrder(orderId, price) {
           .on('receipt', (receipt) => {
             console.log(receipt);
           })
-          .on('confirmation', (confirmationNumber, receipt) => {
-            console.log(receipt);
-            console.log(confirmationNumber);
+          .on('confirmation', (confirmationNumber) => {
+            if (confirmationNumber === 5) {
+              dispatch(getOrderList());
+              dispatch(orderAcceptSetReady());
+            }
           })
           .on('error', error => dispatch(orderAcceptError(error.message))); // If a out of gas error, the second parameter is the receipt.
       } catch (error) {

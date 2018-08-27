@@ -38,7 +38,7 @@ const orderReducer = (state = defaultState, action) => {
         ...state,
         isLoading: false,
         order: action.order,
-        ready: false,
+        ready: state.ready,
         error: null
       };
     default:

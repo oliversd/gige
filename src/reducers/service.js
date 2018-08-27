@@ -13,7 +13,7 @@ const serviceReducer = (state = defaultState, action) => {
       return {
         ...state,
         isLoading: true,
-        service: state.service || [],
+        service: state.service || {},
         ready: state.ready || null,
         error: null
       };
@@ -21,7 +21,7 @@ const serviceReducer = (state = defaultState, action) => {
       return {
         ...state,
         isLoading: false,
-        service: [],
+        service: {},
         ready: null,
         error: action.error
       };
@@ -38,6 +38,14 @@ const serviceReducer = (state = defaultState, action) => {
         ...state,
         isLoading: false,
         service: action.service,
+        ready: state.ready,
+        error: null
+      };
+    case serviceActions.SERVICE_TRANSACTION_CLEAR:
+      return {
+        ...state,
+        isLoading: false,
+        service: {},
         ready: false,
         error: null
       };

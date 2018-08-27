@@ -1,8 +1,13 @@
 export default {
   development: {
-    address: '0xabe36998f3755de1c495d37255c644087f0eb76f'
+    address: '0x5d03be2014faf0b04dfab3487aee721f503fe130'
   },
   rinkeby: {
     address: '0x0113626b8bea23501fe19e442eac80bcb58324f0'
+  },
+  ipfs: {
+    host: 'localhost',
+    port: 5001,
+    protocol: 'http'
   }
 };

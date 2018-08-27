@@ -18,7 +18,7 @@ const SingleService = ({ service, contract }) => (
     {service &&
       service.id && (
         <React.Fragment>
-          <Grid key={service.id} item xs={12} sm={3}>
+          <Grid item xs={12} sm={3}>
             <ServiceCard
               title={service.title}
               image={service.image}
@@ -29,6 +29,7 @@ const SingleService = ({ service, contract }) => (
                   ? 'New quote'
                   : ''
               }
+              isSeller={contract.userAccount === service.seller}
               link={`/quote/create/${service.id}`}
             />
             {contract &&
@@ -56,7 +57,7 @@ const SingleService = ({ service, contract }) => (
                 </div>
               )}
           </Grid>
-          <Grid key={service.id} item xs={12} sm={3}>
+          <Grid item xs={12} sm={3}>
             <p>
               This is just an example of a chat between buyer and seller this
               will be implemented off chain at a later time.

@@ -29,7 +29,7 @@ const orderAcceptReducer = (state = defaultState, action) => {
       return {
         ...state,
         isLoading: false,
-        hash: state.orderAccept,
+        hash: state.hash,
         ready: true,
         error: null
       };

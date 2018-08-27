@@ -16,7 +16,7 @@ import FormHelperText from '@material-ui/core/FormHelperText';
 import red from '@material-ui/core/colors/red';
 import sanitizeHtml from 'sanitize-html';
 
-import createService from '../../actions/service';
+import createService, { clearServiceTransaction } from '../../actions/service';
 import ipfs from '../../utils/ipfs';
 import ipfsUtils from '../../utils/ipfs-utils';
 
@@ -87,6 +87,7 @@ class CreateService extends Component {
     price: 0,
     descriptionLength: null,
     max: 2000,
+    ipfsLoading: false,
     error: {
       title: null,
       description: null,
@@ -96,6 +97,10 @@ class CreateService extends Component {
       price: null
     }
   };
+
+  componentDidMount() {
+    this.props.clearServiceTransaction();
+  }
 
   handleChange = (e) => {
     if (e.target.id === 'description') {
@@ -199,7 +204,7 @@ class CreateService extends Component {
 
   createNewService = async (e) => {
     e.preventDefault();
-
+    this.setState({ ipfsLoading: true });
     if (!this.validateForm()) {
       return;
     }
@@ -241,6 +246,7 @@ class CreateService extends Component {
         })
       );
       const ipfsHash = await ipfs.add(doc);
+      this.setState({ ipfsLoading: false });
       if (ipfsHash) {
         const data = ipfsUtils.ipfsHashto32Bytes(ipfsHash[0].hash);
         this.props.createService(price, data);
@@ -312,8 +318,7 @@ class CreateService extends Component {
                   maxLength={2000}
                 />
                 <FormHelperText>
-                  Characters left
-                  {' '}
+                  Characters left{' '}
                   {!this.state.descriptionLength
                   && this.state.descriptionLength !== 0
                     ? this.state.max
@@ -413,14 +418,24 @@ class CreateService extends Component {
                 variant="raised"
                 color="primary"
                 disabled={
-                  this.props.service.service.transactionHash
-                  && !this.props.service.ready
+                  (this.props.service.service.transactionHash
+                    && !this.props.service.ready)
+                  || this.state.ipfsLoading
                 }
                 className={classes.submit}
               >
-                Create
+                {(this.props.service.service.transactionHash
+                  && !this.props.service.ready)
+                || this.state.ipfsLoading
+                  ? 'Creating'
+                  : 'Create'}
               </Button>
             </form>
+            {this.state.ipfsLoading && (
+              <p className={classes.transactionWait}>
+                Uploading data and image to IPFS please wait...
+              </p>
+            )}
             {this.props.service
               && this.props.service.service.transactionHash
               && !this.props.service.ready && (
@@ -448,14 +463,11 @@ class CreateService extends Component {
 CreateService.propTypes = {
   classes: PropTypes.shape({}).isRequired,
   createService: PropTypes.func.isRequired,
-  contract: PropTypes.shape({
-    web3: PropTypes.object,
-    instance: PropTypes.object
-  }).isRequired,
   service: PropTypes.shape({
     service: PropTypes.object,
     ready: PropTypes.bool
-  }).isRequired
+  }).isRequired,
+  clearServiceTransaction: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => ({
@@ -464,9 +476,10 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  createService: (title, description, image, category, subcategory, pice) => dispatch(
-    createService(title, description, image, category, subcategory, pice)
-  )
+  createService: (title, description, image, category, subcategory, price) => dispatch(
+    createService(title, description, image, category, subcategory, price)
+  ),
+  clearServiceTransaction: () => dispatch(clearServiceTransaction())
 });
 
 export default connect(

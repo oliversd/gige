@@ -169,6 +169,7 @@ class Quote extends Component {
                     'ether'
                   )}
                   buttonText=""
+                  isSeller={contract.userAccount === service.seller}
                 />
               </Grid>
               <Grid item xs={12} sm={3}>
@@ -221,18 +222,20 @@ class Quote extends Component {
                 {this.props.order &&
                   this.props.order.order.transactionHash &&
                   !this.props.order.ready && (
-                    <p className="transaction-wait">
-                      We are creating your order please wait. Transaction:
-                      {this.props.order.order.transactionHash}
+                    <p className={classes.transactionWait}>
+                      {`We are creating your order please wait. Transaction: ${
+                        this.props.order.order.transactionHash
+                      }`}
                     </p>
                   )}
 
                 {this.props.order &&
                   this.props.order.order.transactionHash &&
                   this.props.order.ready && (
-                    <p className="transaction-ready">
-                      Your order is ready!. Transaction:
-                      {this.props.order.order.transactionHash}
+                    <p className={classes.transactionReady}>
+                      {`Your order is ready!. Transaction: ${
+                        this.props.order.order.transactionHash
+                      }`}
                     </p>
                   )}
               </Grid>
@@ -255,11 +258,6 @@ Quote.propTypes = {
     description: PropTypes.string,
     price: PropTypes.string
   }),
-  sellerOrders: PropTypes.shape({
-    id: PropTypes.string,
-    service: PropTypes.object,
-    price: PropTypes.string
-  }).isRequired,
   order: PropTypes.shape({
     order: PropTypes.object,
     ready: PropTypes.bool

@@ -16,7 +16,6 @@ import './style.css';
 
 class Orders extends Component {
   getLabel = (state, type) => {
-    console.log(type);
     if (type === 'seller') {
       switch (Number(state)) {
         case 1:
@@ -53,16 +52,11 @@ class Orders extends Component {
   render() {
     return (
       <div>
-        <h1>
-Orders
-        </h1>
+        <h1>Orders</h1>
         {this.props.orderList
-          && this.props.orderList.sellerOrders.length > 0 && (
-          <h2>
-Buy Orders
-          </h2>
-        )}
+          && this.props.orderList.sellerOrders.length > 0 && <h2>Buy Orders</h2>}
         {this.props.orderAccept
+          && this.props.orderAccept.hash
           && this.props.orderAccept.hash.transactionHash
           && !this.props.orderAccept.ready && (
           <p className="transaction-wait">
@@ -72,6 +66,7 @@ Buy Orders
         )}
 
         {this.props.orderAccept
+          && this.props.orderAccept.hash
           && this.props.orderAccept.hash.transactionHash
           && this.props.orderAccept.ready && (
           <p className="transaction-ready">
@@ -103,11 +98,7 @@ Buy Orders
             ))}
         </Grid>
         {this.props.orderList
-          && this.props.orderList.buyerOrders.length > 0 && (
-          <h2>
-Sell Orders
-          </h2>
-        )}
+          && this.props.orderList.buyerOrders.length > 0 && <h2>Sell Orders</h2>}
         <Grid container spacing={24}>
           {this.props.orderList
             && this.props.orderList.buyerOrders.map(order => (

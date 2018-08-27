@@ -16,7 +16,7 @@ function serviceError(error) {
   };
 }
 
-function serviceSet(service) {
+export function serviceSet(service) {
   return {
     type: serviceActions.SERVICE,
     service
@@ -185,12 +185,26 @@ export function getServiceList() {
           dispatch(serviceListIsLoading());
           const list = await getAllServices(result, instance, from);
           dispatch(serviceListSet(list));
+        } else if (result.length === 0) {
+          return;
         }
       } catch (e) {
-        dispatch(serviceListError(e));
+        dispatch(serviceListError(e.message));
       }
     } else {
       dispatch(serviceError('There is no Web3 instance'));
     }
+  };
+}
+
+function clearTransaction() {
+  return {
+    type: serviceActions.SERVICE_TRANSACTION_CLEAR
+  };
+}
+
+export function clearServiceTransaction() {
+  return async (dispatch) => {
+    dispatch(clearTransaction());
   };
 }

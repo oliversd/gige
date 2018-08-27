@@ -52,9 +52,7 @@ export function setError(error) {
 }
 
 const setEvents = network => (dispatch) => {
-  console.log('set events');
   // We need ws to listen to events
-
   let web3Events = new Web3('ws://localhost:8545');
   let instance = new web3Events.eth.Contract(
     GigEService.abi,
@@ -120,6 +118,7 @@ export default function getContract() {
   // prettier disable-line
   return async (dispatch, getState) => {
     const { contract } = getState();
+
     const web3 = new Web3(Web3.givenProvider || 'ws://localhost:8545');
 
     // currentProvider should return null if there is no provider
@@ -127,11 +126,16 @@ export default function getContract() {
     if (web3.currentProvider) {
       try {
         const network = await web3.eth.net.getNetworkType();
+
         const ContractInstance = await instantiateContract(web3, network);
 
         const accounts = await web3.eth.getAccounts();
         const currentAccount = localStorage.getItem('GigE-account');
         let userAccount = accounts[0];
+
+        if (!userAccount) {
+          userAccount = 'Check that you logged in to metamask';
+        }
 
         // Check if the user has selected an account more for testing purposes
         if (currentAccount && typeof accounts[currentAccount] !== 'undefined') {
