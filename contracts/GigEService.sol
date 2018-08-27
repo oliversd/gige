@@ -110,7 +110,7 @@ contract GigEService is Destructible, Pausable {
       * @param _minimumPrice Service starting price.
       * @param _data IPFS 32byte hash.
       */
-    function createService(uint256 _minimumPrice, bytes32 _data) public {
+    function createService(uint256 _minimumPrice, bytes32 _data) public whenNotPaused() {
         services[serviceId] = Service({id: serviceId, data: _data, minimumPrice: _minimumPrice, seller: msg.sender});
         sellers[serviceId] = msg.sender;
         serviceList.push(serviceId);
@@ -123,7 +123,7 @@ contract GigEService is Destructible, Pausable {
       * @param _price Price of the order in wei.
       * @param _buyer Address of the buyer / payer of the order.
       */
-    function createOrder(uint256 _serviceId, uint256 _price, address _buyer) public verifyCaller(services[_serviceId].seller) {
+    function createOrder(uint256 _serviceId, uint256 _price, address _buyer) public verifyCaller(services[_serviceId].seller) whenNotPaused() {
         Service memory _service = services[_serviceId];
         orders[orderId] = Order({
             id: orderId,
@@ -148,6 +148,7 @@ contract GigEService is Destructible, Pausable {
         isProposal(_orderId)
         verifyCaller(orders[_orderId].buyer)
         checkValue(_orderId)
+        whenNotPaused()
     {
         orders[_orderId].state = OrderState.Accepted;
         emit OrderAccepted(_orderId);
@@ -161,7 +162,8 @@ contract GigEService is Destructible, Pausable {
     function cancelOrder(uint256 _orderId)
         public
         isAccepted(_orderId)
-        verifyCaller(orders[_orderId].seller)        
+        verifyCaller(orders[_orderId].seller)
+        whenNotPaused()
     {
         uint256 payment = orders[_orderId].price;
         assert(balanceLocked[orders[_orderId].buyer] >= payment);
@@ -181,6 +183,7 @@ contract GigEService is Destructible, Pausable {
         public
         isAccepted(_orderId)
         verifyCaller(orders[_orderId].seller)
+        whenNotPaused()
     {
         orders[_orderId].state = OrderState.Finished;
         emit OrderFinished(_orderId);
@@ -193,6 +196,7 @@ contract GigEService is Destructible, Pausable {
         public
         isFinished(_orderId)
         verifyCaller(orders[_orderId].buyer)
+        whenNotPaused()
     {
         uint256 payment = orders[_orderId].price;
         assert(balanceLocked[orders[_orderId].buyer] >= payment);
@@ -209,7 +213,7 @@ contract GigEService is Destructible, Pausable {
     /**
     * @dev withdraw accumulated balance, called by payee.
     */
-    function withdrawPayments() public {
+    function withdrawPayments() public whenNotPaused() {
         address payee = msg.sender;
         uint256 payment = balanceAvailable[payee];
 

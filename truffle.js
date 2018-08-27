@@ -13,7 +13,7 @@
  */
 const HDWalletProvider = require('truffle-hdwallet-provider');
 
-const mnemonic = 'business clump autumn wear motor amateur logic provide absent flat age taxi';
+const mnemonic = '';
 
 module.exports = {
   // See <http://truffleframework.com/docs/advanced/configuration>
