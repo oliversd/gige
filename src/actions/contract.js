@@ -30,12 +30,14 @@ function contractSet(contract, web3, userAccount, network, accounts) {
   };
 }
 
-const instantiateContract = async (web3) => {
+const instantiateContract = async (web3, network) => {
   try {
-    const contractInstance = new web3.eth.Contract(
-      GigEService.abi,
-      contractConfig.address
-    );
+    let address = contractConfig.development.address; // eslint-disable-line
+    if (network === 'rinkeby') {
+      address = contractConfig.rinkeby.address; // eslint-disable-line
+    }
+
+    const contractInstance = new web3.eth.Contract(GigEService.abi, address);
     return contractInstance;
   } catch (error) {
     console.log(error);
@@ -49,14 +51,24 @@ export function setError(error) {
   };
 }
 
-const setEvents = () => (dispatch) => {
+const setEvents = network => (dispatch) => {
   console.log('set events');
   // We need ws to listen to events
-  const web3Events = new Web3('wss://rinkeby.infura.io/_ws');
-  const instance = new web3Events.eth.Contract(
+
+  let web3Events = new Web3('ws://localhost:8545');
+  let instance = new web3Events.eth.Contract(
     GigEService.abi,
-    contractConfig.address
+    contractConfig.development.address
   );
+
+  if (network === 'rinkeby') {
+    web3Events = new Web3('wss://rinkeby.infura.io/_ws');
+    instance = new web3Events.eth.Contract(
+      GigEService.abi,
+      contractConfig.rinkeby.address
+    );
+  }
+
   /* const subscription = web3Events.eth
     .subscribe('pendingTransactions', (error, result) => {})
     .on('data', (transactionHash) => {
@@ -114,7 +126,8 @@ export default function getContract() {
     // but right now is not working web3 1.0.0-beta.35
     if (web3.currentProvider) {
       try {
-        const ContractInstance = await instantiateContract(web3);
+        const network = await web3.eth.net.getNetworkType();
+        const ContractInstance = await instantiateContract(web3, network);
 
         const accounts = await web3.eth.getAccounts();
         const currentAccount = localStorage.getItem('GigE-account');
@@ -133,10 +146,9 @@ export default function getContract() {
         ) {
           return true;
         }
-        const network = await web3.eth.net.getNetworkType();
 
         dispatch(contractIsLoading());
-        dispatch(setEvents());
+        dispatch(setEvents(network));
         dispatch(
           contractSet(ContractInstance, web3, userAccount, network, accounts)
         );
