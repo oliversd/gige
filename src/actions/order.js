@@ -335,3 +335,165 @@ export function cancelOrder(orderId, price) {
     }
   };
 }
+
+/**
+ * Order Completed
+ */
+function orderCompleteIsLoading() {
+  return {
+    type: orderActions.ORDER_COMPLETE_IS_LOADING,
+    isLoading: true
+  };
+}
+
+function orderCompleteError(error) {
+  return {
+    type: orderActions.ORDER_COMPLETE_ERROR,
+    error
+  };
+}
+
+function orderCompleteSet(hash) {
+  return {
+    type: orderActions.ORDER_COMPLETE,
+    hash
+  };
+}
+
+function orderCompleteReady() {
+  return {
+    type: orderActions.ORDER_COMPLETE_SET_READY,
+    ready: true
+  };
+}
+
+export function orderCompleteSetReady() {
+  return (dispatch) => {
+    dispatch(orderCompleteReady());
+  };
+}
+export function finishOrder(orderId, price) {
+  return async (dispatch, getState) => {
+    dispatch(orderCompleteIsLoading());
+    const { contract } = getState();
+
+    if (contract.web3 !== null && contract.instance !== null) {
+      try {
+        const { web3, instance } = contract;
+        const accounts = await web3.eth.getAccounts();
+        let from = accounts[0];
+        const currentAccount = localStorage.getItem('GigE-account');
+
+        // Check if the user has selected an account more for testing purposes
+        if (currentAccount && typeof accounts[currentAccount] !== 'undefined') {
+          from = accounts[currentAccount];
+        }
+
+        // BN not working with decimals i.e: 0.5
+        // const priceBN = new web3.utils.BN(price.toString());
+
+        await instance.methods
+          .finishOrder(orderId)
+          .send({ from, value: price, gas: 50000 })
+          .on('transactionHash', (transactionHash) => {
+            dispatch(orderCompleteSet({ transactionHash }));
+          })
+          .on('receipt', (receipt) => {
+            console.log(receipt);
+          })
+          .on('confirmation', (confirmationNumber) => {
+            if (confirmationNumber === 5) {
+              dispatch(getOrderList(true));
+              dispatch(orderCompleteSetReady());
+            }
+          })
+          .on('error', error => dispatch(orderCompleteError(error.message))); // If a out of gas error, the second parameter is the receipt.
+      } catch (error) {
+        dispatch(orderCompleteError(error.message));
+      }
+    } else {
+      dispatch(orderCompleteError('There is no Web3 instance'));
+    }
+  };
+}
+
+/**
+ * Release Payment
+ */
+function orderReleaseIsLoading() {
+  return {
+    type: orderActions.ORDER_RELEASE_IS_LOADING,
+    isLoading: true
+  };
+}
+
+function orderReleaseError(error) {
+  return {
+    type: orderActions.ORDER_RELEASE_ERROR,
+    error
+  };
+}
+
+function orderReleaseSet(hash) {
+  return {
+    type: orderActions.ORDER_RELEASE,
+    hash
+  };
+}
+
+function orderReleaseReady() {
+  return {
+    type: orderActions.ORDER_RELEASE_SET_READY,
+    ready: true
+  };
+}
+
+export function orderReleaseSetReady() {
+  return (dispatch) => {
+    dispatch(orderReleaseReady());
+  };
+}
+export function releaseOrder(orderId, price) {
+  return async (dispatch, getState) => {
+    dispatch(orderReleaseIsLoading());
+    const { contract } = getState();
+
+    if (contract.web3 !== null && contract.instance !== null) {
+      try {
+        const { web3, instance } = contract;
+        const accounts = await web3.eth.getAccounts();
+        let from = accounts[0];
+        const currentAccount = localStorage.getItem('GigE-account');
+
+        // Check if the user has selected an account more for testing purposes
+        if (currentAccount && typeof accounts[currentAccount] !== 'undefined') {
+          from = accounts[currentAccount];
+        }
+
+        // BN not working with decimals i.e: 0.5
+        // const priceBN = new web3.utils.BN(price.toString());
+
+        await instance.methods
+          .releaseOrder(orderId)
+          .send({ from, value: price, gas: 70000 })
+          .on('transactionHash', (transactionHash) => {
+            dispatch(orderReleaseSet({ transactionHash }));
+          })
+          .on('receipt', (receipt) => {
+            console.log(receipt);
+          })
+          .on('confirmation', (confirmationNumber) => {
+            if (confirmationNumber === 5) {
+              dispatch(getOrderList(true));
+              dispatch(orderReleaseSetReady());
+            }
+          })
+          .on('error', error => dispatch(orderReleaseError(error.message))); // If a out of gas error, the second parameter is the receipt.
+      } catch (error) {
+        dispatch(orderReleaseError(error.message));
+      }
+    } else {
+      dispatch(orderReleaseError('There is no Web3 instance'));
+    }
+  };
+}

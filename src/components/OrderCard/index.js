@@ -36,6 +36,12 @@ const OrderCard = ({
         <Typography color="textSecondary">{title}</Typography>
         <Typography component="p">{`buyer: ${buyer}`}</Typography>
         <Typography component="p">{`seller: ${seller}`}</Typography>
+        {stateCode === '4'
+          && seller === 'You' && (
+          <Typography component="p">
+              You have to ask the buyer to release the payment
+          </Typography>
+        )}
       </CardContent>
       {buttonLabel && (
         <CardActions>
