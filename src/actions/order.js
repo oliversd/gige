@@ -483,7 +483,7 @@ export function releaseOrder(orderId, price) {
             console.log(receipt);
           })
           .on('confirmation', (confirmationNumber) => {
-            if (confirmationNumber === 5) {
+            if (confirmationNumber === 30) {
               dispatch(getOrderList(true));
               dispatch(orderReleaseSetReady());
             }
