@@ -121,7 +121,7 @@ const getAllOrders = async (orders, instance, from, serviceList) => {
   return result;
 };
 
-export function getOrderList() {
+export function getOrderList(force = false) {
   return async (dispatch, getState) => {
     const { contract, orderList, serviceList } = getState();
 
@@ -143,10 +143,11 @@ export function getOrderList() {
           .getOrdersFromBuyer(from)
           .call({ from });
         if (
-          serviceList.data.length > 0
-          && (sellerOrders.length > 0 || buyerOrders.length > 0)
-          && (orderList.sellerOrders.length !== sellerOrders.length
-            || orderList.buyerOrders.length !== buyerOrders.length)
+          force
+          || (serviceList.data.length > 0
+            && (sellerOrders.length > 0 || buyerOrders.length > 0)
+            && (orderList.sellerOrders.length !== sellerOrders.length
+              || orderList.buyerOrders.length !== buyerOrders.length))
         ) {
           dispatch(orderListIsLoading());
           const listSeller = await getAllOrders(
@@ -229,9 +230,6 @@ export function acceptOrder(orderId, price) {
         // BN not working with decimals i.e: 0.5
         // const priceBN = new web3.utils.BN(price.toString());
 
-        // suppose you want to call a function named myFunction of myContract
-        // const acceptOrderFunc = await instance.acceptOrder.getData(orderId);
-        // finally paas this data parameter to send Transaction
         await instance.methods
           .acceptOrder(orderId)
           .send({ from, value: price })
@@ -243,7 +241,7 @@ export function acceptOrder(orderId, price) {
           })
           .on('confirmation', (confirmationNumber) => {
             if (confirmationNumber === 5) {
-              dispatch(getOrderList());
+              dispatch(getOrderList(true));
               dispatch(orderAcceptSetReady());
             }
           })
@@ -253,6 +251,87 @@ export function acceptOrder(orderId, price) {
       }
     } else {
       dispatch(orderAcceptError('There is no Web3 instance'));
+    }
+  };
+}
+
+/**
+ * Order Cancel
+ */
+function orderCancelIsLoading() {
+  return {
+    type: orderActions.ORDER_CANCEL_IS_LOADING,
+    isLoading: true
+  };
+}
+
+function orderCancelError(error) {
+  return {
+    type: orderActions.ORDER_CANCEL_ERROR,
+    error
+  };
+}
+
+function orderCancelSet(hash) {
+  return {
+    type: orderActions.ORDER_CANCEL,
+    hash
+  };
+}
+
+function orderCancelReady() {
+  return {
+    type: orderActions.ORDER_CANCEL_SET_READY,
+    ready: true
+  };
+}
+
+export function orderCancelSetReady() {
+  return (dispatch) => {
+    dispatch(orderCancelReady());
+  };
+}
+export function cancelOrder(orderId, price) {
+  return async (dispatch, getState) => {
+    dispatch(orderCancelIsLoading());
+    const { contract } = getState();
+
+    if (contract.web3 !== null && contract.instance !== null) {
+      try {
+        const { web3, instance } = contract;
+        const accounts = await web3.eth.getAccounts();
+        let from = accounts[0];
+        const currentAccount = localStorage.getItem('GigE-account');
+
+        // Check if the user has selected an account more for testing purposes
+        if (currentAccount && typeof accounts[currentAccount] !== 'undefined') {
+          from = accounts[currentAccount];
+        }
+
+        // BN not working with decimals i.e: 0.5
+        // const priceBN = new web3.utils.BN(price.toString());
+
+        await instance.methods
+          .cancelOrder(orderId)
+          .send({ from, value: price, gas: 50000 })
+          .on('transactionHash', (transactionHash) => {
+            dispatch(orderCancelSet({ transactionHash }));
+          })
+          .on('receipt', (receipt) => {
+            console.log(receipt);
+          })
+          .on('confirmation', (confirmationNumber) => {
+            if (confirmationNumber === 5) {
+              dispatch(getOrderList(true));
+              dispatch(orderCancelSetReady());
+            }
+          })
+          .on('error', error => dispatch(orderCancelError(error.message))); // If a out of gas error, the second parameter is the receipt.
+      } catch (error) {
+        dispatch(orderCancelError(error.message));
+      }
+    } else {
+      dispatch(orderCancelError('There is no Web3 instance'));
     }
   };
 }

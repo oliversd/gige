@@ -28,3 +28,13 @@
   padding: 20px;
   color: #333;
 }
+
+.transaction-error {
+  display: 'block';
+  width: '100%';
+  word-wrap: 'break-word';
+  font-size: '0.9rem';
+  background: #f44336;
+  padding: 20px;
+  color: #fff;
+}

@@ -16,7 +16,9 @@ const OrderCard = ({
   seller,
   buttonLabel,
   handleClick,
-  stateCode
+  stateCode,
+  secondButtonLabel,
+  secondButtonHandleClick
 }) => (
   <React.Fragment>
     <Card>
@@ -45,6 +47,16 @@ const OrderCard = ({
           >
             {buttonLabel}
           </Button>
+          {secondButtonLabel && (
+            <Button
+              variant="contained"
+              color="secondary"
+              size="small"
+              onClick={() => secondButtonHandleClick(id, stateCode, price)}
+            >
+              {secondButtonLabel}
+            </Button>
+          )}
         </CardActions>
       )}
     </Card>
@@ -60,7 +72,9 @@ OrderCard.propTypes = {
   seller: PropTypes.string.isRequired,
   buttonLabel: PropTypes.string.isRequired,
   stateCode: PropTypes.string.isRequired,
-  handleClick: PropTypes.func.isRequired
+  handleClick: PropTypes.func.isRequired,
+  secondButtonLabel: PropTypes.string.isRequired,
+  secondButtonHandleClick: PropTypes.func.isRequired
 };
 
 export default OrderCard;

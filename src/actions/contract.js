@@ -91,7 +91,7 @@ const setEvents = network => (dispatch) => {
     .OrderProposal()
     .on('data', (event) => {
       dispatch(orderSetReady());
-      dispatch(getOrderList());
+      dispatch(getOrderList(true));
       console.log(event);
     })
     .on('changed', (event) => {
@@ -104,7 +104,20 @@ const setEvents = network => (dispatch) => {
     .OrderAccepted()
     .on('data', (event) => {
       dispatch(orderAcceptSetReady());
-      dispatch(getOrderList());
+      dispatch(getOrderList(true));
+      console.log(event);
+    })
+    .on('changed', (event) => {
+      // remove event from local database
+      console.log(event);
+    })
+    .on('error', console.error);
+
+  instance.events
+    .OrderCancel()
+    .on('data', (event) => {
+      dispatch(orderAcceptSetReady());
+      dispatch(getOrderList(true));
       console.log(event);
     })
     .on('changed', (event) => {

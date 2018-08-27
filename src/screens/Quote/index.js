@@ -136,7 +136,7 @@ class Quote extends Component {
     const { price, buyer } = this.state;
 
     try {
-      this.props.createOrder(this.props.service.id, price, buyer);
+      await this.props.createOrder(this.props.service.id, price, buyer);
       this.setState({
         buyer: '',
         price: ''
@@ -214,6 +214,7 @@ class Quote extends Component {
                     fullWidth
                     variant="raised"
                     color="primary"
+                    disabled={this.props.order.isLoading}
                     className={classes.submit}
                   >
                     Create

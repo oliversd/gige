@@ -74,6 +74,15 @@ const styles = theme => ({
     background: theme.palette.primary.light,
     padding: 20,
     color: '#333'
+  },
+  transactionError: {
+    display: 'block',
+    width: '100%',
+    wordWrap: 'break-word',
+    fontSize: '0.9rem',
+    background: red[500],
+    padding: 20,
+    color: '#fff'
   }
 });
 
@@ -204,10 +213,11 @@ class CreateService extends Component {
 
   createNewService = async (e) => {
     e.preventDefault();
-    this.setState({ ipfsLoading: true });
+
     if (!this.validateForm()) {
       return;
     }
+    this.setState({ ipfsLoading: true });
 
     const {
       title,
@@ -249,7 +259,7 @@ class CreateService extends Component {
       this.setState({ ipfsLoading: false });
       if (ipfsHash) {
         const data = ipfsUtils.ipfsHashto32Bytes(ipfsHash[0].hash);
-        this.props.createService(price, data);
+        await this.props.createService(price, data);
         this.setState({
           title: '',
           description: '',
@@ -453,6 +463,14 @@ class CreateService extends Component {
                 {this.props.service.service.transactionHash}
               </p>
             )}
+
+            {this.props.service
+              && this.props.service.error && (
+              <p className={classes.transactionError}>
+                  There was an error:
+                {this.props.service.error}
+              </p>
+            )}
           </Paper>
         </main>
       </React.Fragment>
@@ -465,7 +483,8 @@ CreateService.propTypes = {
   createService: PropTypes.func.isRequired,
   service: PropTypes.shape({
     service: PropTypes.object,
-    ready: PropTypes.bool
+    ready: PropTypes.bool,
+    error: PropTypes.string
   }).isRequired,
   clearServiceTransaction: PropTypes.func.isRequired
 };

@@ -6,7 +6,7 @@ import Grid from '@material-ui/core/Grid';
 // import t from "../../utils/i18n/lang";
 import OrderState from '../../utils/order-utils';
 // actions import
-import { acceptOrder } from '../../actions/order';
+import { acceptOrder, cancelOrder } from '../../actions/order';
 // hoc import
 // components import
 import OrderCard from '../../components/OrderCard';
@@ -47,6 +47,10 @@ class Orders extends Component {
         this.props.contract.web3.utils.toWei(price, 'ether')
       );
     }
+    // If the order is accepted
+    if (Number(state) === 1) {
+      this.props.cancelOrder(orderId);
+    }
   };
 
   render() {
@@ -74,6 +78,43 @@ class Orders extends Component {
             {this.props.orderAccept.hash.transactionHash}
           </p>
         )}
+
+        {this.props.orderCancel
+          && this.props.orderCancel.hash
+          && this.props.orderCancel.hash.transactionHash
+          && !this.props.orderCancel.ready && (
+          <p className="transaction-wait">
+              We are creating your order please wait. Transaction:
+            {this.props.orderCancel.hash.transactionHash}
+          </p>
+        )}
+
+        {this.props.orderCancel
+          && this.props.orderCancel.hash
+          && this.props.orderCancel.hash.transactionHash
+          && this.props.orderCancel.ready && (
+          <p className="transaction-ready">
+              Your order is ready!. Transaction:
+            {this.props.orderCancel.hash.transactionHash}
+          </p>
+        )}
+
+        {this.props.orderCancel
+          && this.props.orderCancel.error && (
+          <p className="transaction-error">
+              Error:
+            {this.props.orderCancel.error}
+          </p>
+        )}
+
+        {this.props.orderAccept
+          && this.props.orderAccept.error && (
+          <p className="transaction-error">
+              Error:
+            {this.props.orderAccept.error}
+          </p>
+        )}
+
         <Grid container spacing={24}>
           {this.props.orderList
             && this.props.orderList.sellerOrders.map(order => (
@@ -91,7 +132,9 @@ class Orders extends Component {
                   seller="You"
                   state={OrderState(order.state)}
                   stateCode={order.state}
-                  buttonLabel={this.getLabel(order.state, 'seller')}
+                  buttonLabel={order.state === '1' ? 'Job completed' : ''}
+                  secondButtonLabel={this.getLabel(order.state, 'seller')}
+                  secondButtonHandleClick={this.handleClick}
                   handleClick={this.handleClick}
                 />
               </Grid>
@@ -134,24 +177,33 @@ Orders.propTypes = {
   }).isRequired,
   orderAccept: PropTypes.shape({
     hash: PropTypes.string,
-    ready: PropTypes.bool
+    ready: PropTypes.bool,
+    error: PropTypes.string
+  }).isRequired,
+  orderCancel: PropTypes.shape({
+    hash: PropTypes.object,
+    ready: PropTypes.bool,
+    error: PropTypes.string
   }).isRequired,
   contract: PropTypes.shape({
     web3: PropTypes.object,
     userAccount: PropTypes.string
   }).isRequired,
-  acceptOrder: PropTypes.func.isRequired
+  acceptOrder: PropTypes.func.isRequired,
+  cancelOrder: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => ({
   contract: state.contract,
   serviceList: state.serviceList,
   orderList: state.orderList,
-  orderAccept: state.orderAccept
+  orderAccept: state.orderAccept,
+  orderCancel: state.orderCancel
 });
 
 const mapDispatchToProps = dispatch => ({
-  acceptOrder: (orderId, price) => dispatch(acceptOrder(orderId, price))
+  acceptOrder: (orderId, price) => dispatch(acceptOrder(orderId, price)),
+  cancelOrder: orderId => dispatch(cancelOrder(orderId))
 });
 
 export default connect(

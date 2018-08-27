@@ -2,22 +2,22 @@ import { orderActions } from '../config/actions';
 
 const defaultState = {
   isLoading: false,
-  hash: '',
+  hash: {},
   ready: false,
   error: null
 };
 
-const orderAcceptReducer = (state = defaultState, action) => {
+const orderCancelReducer = (state = defaultState, action) => {
   switch (action.type) {
-    case orderActions.ORDER_ACCEPT_IS_LOADING:
+    case orderActions.ORDER_CANCEL_IS_LOADING:
       return {
         ...state,
         isLoading: true,
-        hash: state.hash || '',
+        hash: state.hash || {},
         ready: state.ready || null,
         error: null
       };
-    case orderActions.ORDER_ACCEPT_ERROR:
+    case orderActions.ORDER_CANCEL_ERROR:
       return {
         ...state,
         isLoading: false,
@@ -25,7 +25,7 @@ const orderAcceptReducer = (state = defaultState, action) => {
         ready: null,
         error: action.error
       };
-    case orderActions.ORDER_ACCEPT_SET_READY:
+    case orderActions.ORDER_CANCEL_SET_READY:
       return {
         ...state,
         isLoading: false,
@@ -33,7 +33,7 @@ const orderAcceptReducer = (state = defaultState, action) => {
         ready: true,
         error: null
       };
-    case orderActions.ORDER_ACCEPT:
+    case orderActions.ORDER_CANCEL:
       return {
         ...state,
         isLoading: false,
@@ -46,4 +46,4 @@ const orderAcceptReducer = (state = defaultState, action) => {
   }
 };
 
-export default orderAcceptReducer;
+export default orderCancelReducer;
