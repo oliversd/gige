@@ -1,5 +1,9 @@
 {
   "name": "gige-dapp",
+  "author": {
+    "email": "oliversd@gmail.com",
+    "name": "Olivers De Abreu"
+  },
   "version": "0.1.0",
   "description": "GigE Dapp",
   "private": true,
