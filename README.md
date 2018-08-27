@@ -30,7 +30,7 @@ npm install -g truffle
 npm install -g ganache-cli
 ```
 
-Optionally you can install IPFS.
+Optionally you can install IPFS. But highly recomended.
 
 ### Installing
 
