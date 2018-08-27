@@ -7,6 +7,7 @@ import WarningIcon from '@material-ui/icons/WarningOutlined';
 import getContract, { setError } from '../actions/contract';
 import { getServiceList } from '../actions/service';
 import { getOrderList } from '../actions/order';
+import getAvailablePayments from '../actions/payments';
 
 function WithAsyncWeb3(Component) {
   class Web3Component extends React.Component {
@@ -47,6 +48,7 @@ function WithAsyncWeb3(Component) {
       } else {
         this.props.getServiceList();
         this.props.getOrderList();
+        this.props.getAvailablePayments();
       }
     }
 
@@ -82,7 +84,8 @@ function WithAsyncWeb3(Component) {
     getContract: () => dispatch(getContract()),
     setError: error => dispatch(setError(error)),
     getServiceList: () => dispatch(getServiceList()),
-    getOrderList: () => dispatch(getOrderList())
+    getOrderList: () => dispatch(getOrderList()),
+    getAvailablePayments: () => dispatch(getAvailablePayments())
   });
 
   return connect(

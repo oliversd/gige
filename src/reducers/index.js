@@ -9,6 +9,8 @@ import orderAccept from './orderAccept';
 import orderCancel from './orderCancel';
 import orderComplete from './orderComplete';
 import orderRelease from './orderRelease';
+import payment from './payment';
+import withdraw from './withdraw';
 
 export default combineReducers({
   data,
@@ -20,5 +22,7 @@ export default combineReducers({
   orderAccept,
   orderCancel,
   orderComplete,
-  orderRelease
+  orderRelease,
+  payment,
+  withdraw
 });

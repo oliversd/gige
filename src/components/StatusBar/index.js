@@ -8,6 +8,11 @@ import Select from '@material-ui/core/Select';
 import Chip from '@material-ui/core/Chip';
 import './style.css';
 
+import getAvailablePayments, {
+  withdrawPayments,
+  clearWithdraw
+} from '../../actions/payments';
+
 class StatusBar extends Component {
   state = {
     show: false,
@@ -16,13 +21,9 @@ class StatusBar extends Component {
 
   componentDidMount() {
     const currentAccount = localStorage.getItem('GigE-account');
-    console.log(currentAccount);
     if (currentAccount) {
       this.setState({ account: Number(currentAccount) });
     }
-    /* const show = localStorage.getItem('GigE-statusbar');
-    console.log(show);
-    this.setState({ show }); */
   }
 
   getEvents = () => {
@@ -36,6 +37,15 @@ class StatusBar extends Component {
           console.log(events); // same results as the optional callback above
         });
     }
+  };
+
+  getPayments = () => {
+    this.props.getAvailablePayments();
+    this.props.clearWithdraw();
+  };
+
+  withdraw = () => {
+    this.props.withdrawPayments();
   };
 
   handleChange = (event) => {
@@ -56,18 +66,15 @@ class StatusBar extends Component {
       <div className={show ? 'status-bar' : 'status-bar collapsed'}>
         {show && (
           <div>
-            <p>
-This is for testing purpose only
-            </p>
+            <p>This is for testing purpose only</p>
             <Chip
               label="Hide this"
               onDelete={this.toggleView}
               onClick={this.toggleView}
               color="primary"
             />
-            <p>
-              {`Current Network: ${this.props.contract
-                && this.props.contract.network}`}
+            <p>{`Current Network: ${this.props.contract
+              && this.props.contract.network}`}
             </p>
             <p className="current-account">
               {`Current Account: ${this.props.contract
@@ -79,9 +86,7 @@ This is for testing purpose only
             </p>
             <form autoComplete="off">
               <FormControl>
-                <InputLabel htmlFor="account">
-Select account
-                </InputLabel>
+                <InputLabel htmlFor="account">Select account</InputLabel>
                 <Select
                   value={this.state.account}
                   onChange={this.handleChange}
@@ -124,6 +129,48 @@ Select account
               {`Current Network: ${this.props.contract
                 && this.props.contract.network}`}
             </p>
+            <Chip
+              color="secondary"
+              label={`You have ${this.props.amount} ETH for withdraw`}
+              onClick={this.getPayments}
+            />
+            <div>
+              {this.props.amount
+                && Number(this.props.amount) > 0 && (
+                <Chip
+                  color="primary"
+                  label="Click to withdraw to your account"
+                  onClick={this.withdraw}
+                />
+              )}
+              {this.props.withdraw
+                && this.props.withdraw.hash
+                && this.props.withdraw.hash.transactionHash
+                && !this.props.withdraw.ready && (
+                <p className="transaction-wait">
+                    We are creating your order please wait. Transaction:
+                  {this.props.withdraw.hash.transactionHash}
+                </p>
+              )}
+
+              {this.props.withdraw
+                && this.props.withdraw.hash
+                && this.props.withdraw.hash.transactionHash
+                && this.props.withdraw.ready && (
+                <p className="transaction-ready">
+                    Your order is ready!. Transaction:
+                  {this.props.withdraw.hash.transactionHash}
+                </p>
+              )}
+
+              {this.props.withdraw
+                && this.props.withdraw.error && (
+                <p className="transaction-error">
+                    Error:
+                  {this.props.withdraw.error}
+                </p>
+              )}
+            </div>
           </div>
         )}
       </div>
@@ -138,11 +185,46 @@ StatusBar.propTypes = {
     userAccount: PropTypes.string,
     network: PropTypes.string,
     accounts: PropTypes.array
-  }).isRequired
+  }).isRequired,
+  withdraw: PropTypes.shape({
+    hash: PropTypes.object,
+    ready: PropTypes.bool,
+    error: PropTypes.string
+  }).isRequired,
+  getAvailablePayments: PropTypes.func.isRequired,
+  withdrawPayments: PropTypes.func.isRequired,
+  clearWithdraw: PropTypes.func.isRequired,
+  amount: PropTypes.string.isRequired
 };
 
-const mapStateToProps = state => ({
-  contract: state.contract
+const mapStateToProps = (state) => {
+  let amount = '';
+  if (
+    state.contract
+    && state.contract
+    && state.contract.web3
+    && state.contract.web3.utils
+    && state.payment
+    && state.payment.data
+  ) {
+    amount = state.contract.web3.utils.fromWei(state.payment.data, 'ether');
+  }
+
+  return {
+    contract: state.contract,
+    payment: state.payment,
+    amount,
+    withdraw: state.withdraw
+  };
+};
+
+const mapDispatchToProps = dispatch => ({
+  getAvailablePayments: () => dispatch(getAvailablePayments()),
+  withdrawPayments: () => dispatch(withdrawPayments()),
+  clearWithdraw: () => dispatch(clearWithdraw())
 });
 
-export default connect(mapStateToProps)(StatusBar);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(StatusBar);
