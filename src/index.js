@@ -3,14 +3,12 @@ import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 
-import { lang } from './services/i18n/lang';
+import { lang } from './utils/i18n/lang';
 import configureStore from './store/configureStore';
 import './index.css';
 import App from './App';
 import registerServiceWorker from './registerServiceWorker';
-import theme1 from './themes/theme1/';
-// import theme2 from './themes/theme2/';
-// import theme3 from './themes/theme3/';
+import theme1 from './themes/theme1';
 
 lang
   .init({

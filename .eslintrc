@@ -1,7 +1,15 @@
 {
   "rules": {
-    "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }],
+    "react/jsx-filename-extension": [
+      1,
+      {
+        "extensions": [".js", ".jsx"]
+      }
+    ],
     "jsx-a11y/href-no-hash": "off",
+    "import/no-cycle": "off",
+    "react/jsx-one-expression-per-line": "off",
+    "react/destructuring-assignment": [0, "never"],
     "indent": [
       2,
       2,

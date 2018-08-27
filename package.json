@@ -1,12 +1,18 @@
 {
   "name": "gige-dapp",
+  "author": {
+    "email": "oliversd@gmail.com",
+    "name": "Olivers De Abreu"
+  },
   "version": "0.1.0",
   "description": "GigE Dapp",
   "private": true,
   "dependencies": {
     "@material-ui/core": "^1.4.3",
     "@material-ui/icons": "^2.0.1",
+    "bs58": "^4.0.1",
     "i18next": "^11.6.0",
+    "ipfs-api": "^24.0.0",
     "prop-types": "^15.6.2",
     "react": "^16.4.2",
     "react-dom": "^16.4.2",
@@ -17,6 +23,7 @@
     "react-scripts": "1.1.4",
     "redux": "^4.0.0",
     "redux-thunk": "^2.3.0",
+    "sanitize-html": "^1.18.4",
     "web3": "^1.0.0-beta.35"
   },
   "scripts": {
@@ -37,11 +44,21 @@
     "lint-staged": "^7.2.2",
     "prettier": "^1.14.2",
     "stylelint": "^9.4.0",
-    "stylelint-config-standard": "^18.2.0"
+    "stylelint-config-standard": "^18.2.0",
+    "truffle-hdwallet-provider": "^0.0.6"
   },
   "lint-staged": {
-    "src/**/*.{js,jsx}": ["eslint --fix", "git add"],
-    "src/**/*.{css}": ["stylelint --fix", "git add"],
-    "src/**/*.{js,jsx,json,css}": ["prettier --single-quote --write", "git add"]
+    "src/**/*.{js,jsx}": [
+      "eslint --fix",
+      "git add"
+    ],
+    "src/**/*.{css}": [
+      "stylelint --fix",
+      "git add"
+    ],
+    "src/**/*.{js,jsx,json,css}": [
+      "prettier --single-quote --write",
+      "git add"
+    ]
   }
 }

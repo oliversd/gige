@@ -11,6 +11,9 @@
  *     gasPrice: 10000000000,
  *   },
  */
+const HDWalletProvider = require('truffle-hdwallet-provider');
+
+const mnemonic = '';
 
 module.exports = {
   // See <http://truffleframework.com/docs/advanced/configuration>
@@ -20,6 +23,15 @@ module.exports = {
       host: '127.0.0.1',
       port: 8545,
       network_id: '*'
+    },
+    rinkeby: {
+      provider: () => new HDWalletProvider(
+        mnemonic,
+        'https://rinkeby.infura.io/v3/5fb24cc54d4a4e64b48a3a616ebc7b79'
+      ),
+      network_id: 4,
+      gas: 6612388, // Gas limit used for deploys
+      gasPrice: 20000000000 // 20 gwei
     }
   }
 };

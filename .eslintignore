@@ -1,2 +1,4 @@
 /contracts/*
 /migrations/*
+/installed_contracts/*
+/test

@@ -1,0 +1,17 @@
+.status-bar {
+  text-align: right;
+  width: 98%;
+  background: #d9e4cc;
+  color: #333;
+  padding: 20px;
+}
+
+.status-bar.collapsed {
+  background: none;
+}
+
+.current-account {
+  margin-top: 10px;
+  font-size: 0.8rem;
+  font-weight: 700;
+}

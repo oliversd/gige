@@ -1,0 +1,10 @@
+.chat {
+  overflow-x: auto;
+  overflow-y: scroll;
+  padding: 5px;
+  border: 1px dashed #333;
+}
+.chat-seller {
+  float: right;
+  text-decoration: underline;
+}

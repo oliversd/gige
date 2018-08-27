@@ -1,0 +1,40 @@
+.logo-home {
+  width: 50%;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.media {
+  height: 0;
+  padding-top: 56.25%; /* 16:9  */
+}
+
+.transaction-ready {
+  display: 'block';
+  width: '100%';
+  word-wrap: 'break-word';
+  font-size: '0.9rem';
+  background: #ff844c;
+  padding: 20px;
+  color: #fff;
+}
+
+.transaction-wait {
+  display: 'block';
+  width: '100%';
+  word-wrap: 'break-word';
+  font-size: '0.9rem';
+  background: #c5cae9;
+  padding: 20px;
+  color: #333;
+}
+
+.transaction-error {
+  display: 'block';
+  width: '100%';
+  word-wrap: 'break-word';
+  font-size: '0.9rem';
+  background: #f44336;
+  padding: 20px;
+  color: #fff;
+}
