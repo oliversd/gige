@@ -33,11 +33,11 @@ const Home = ({ serviceList, contract }) => (
       {serviceList
         && serviceList.data.map(service => (
           <Grid key={service.id} item xs={12} sm={3}>
-            {contract.userAccount === service.seller && 'Your service'}
             <ServiceCard
               title={service.title}
               image={service.image}
               description={service.description.substr(0, 55)}
+              isSeller={contract.userAccount === service.seller}
               price={
                 contract
                 && contract.web3

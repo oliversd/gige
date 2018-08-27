@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
@@ -80,7 +81,7 @@ class Quote extends Component {
     error: {}
   };
 
-  handleChange = (e) => {
+  handleChange = e => {
     const text = sanitizeHtml(e.target.value.substr(0, 50), {
       allowedTags: [],
       allowedAttributes: []
@@ -108,8 +109,8 @@ class Quote extends Component {
     }
 
     if (
-      price
-      && (Number(price) > 1000 || Number(price) < 0.000000000000000001)
+      price &&
+      (Number(price) > 1000 || Number(price) < 0.000000000000000001)
     ) {
       errors = {
         ...errors,
@@ -125,7 +126,7 @@ class Quote extends Component {
     return true;
   };
 
-  createNewService = async (e) => {
+  createNewService = async e => {
     e.preventDefault();
 
     if (!this.validateForm()) {
@@ -146,85 +147,97 @@ class Quote extends Component {
   };
 
   render() {
-    const {
-      service, contract, classes, sellerOrders
-    } = this.props;
+    const { service, contract, classes } = this.props;
     const { price, buyer, error } = this.state;
     return (
       <div>
-        {service
-          && service.id && (
-          <Grid
-            container
-            justify="center"
-            spacing={24}
-            style={{ marginTop: 20 }}
-          >
-            <Grid item xs={12} sm={3}>
-              <ServiceCard
-                title={service.title}
-                image={service.image}
-                description={service.description}
-                price={contract.web3.utils.fromWei(
-                  service.minimumPrice,
-                  'ether'
-                )}
-                buttonText="Get a quote"
-              />
-            </Grid>
-            <Grid item xs={12} sm={3}>
-              <Typography variant="headline">Create Quote</Typography>
-              <form
-                className={classes.form}
-                onSubmit={this.createNewService}
-                encType="multipart/form-data"
-              >
-                <FormControl margin="normal" fullWidth error={!!error.buyer}>
-                  <InputLabel htmlFor="buyer">Buyer Address</InputLabel>
-                  <Input
-                    id="buyer"
-                    name="buyer"
-                    value={buyer}
-                    onChange={this.handleChange}
-                    autoFocus
-                    maxLength="30"
-                  />
-                  <FormHelperText>
-                    {error.buyer ? error.buyer : ''}
-                  </FormHelperText>
-                </FormControl>
-                <FormControl margin="normal" fullWidth error={!!error.price}>
-                  <InputLabel htmlFor="price">Price</InputLabel>
-                  <Input
-                    id="price"
-                    name="price"
-                    type="number"
-                    value={price}
-                    onChange={this.handleChange}
-                    endAdornment={
-                      <InputAdornment position="end">ETH</InputAdornment>
-                    }
-                  />
-                  <FormHelperText>
-                    {error.price ? error.price : ''}
-                  </FormHelperText>
-                </FormControl>
-                <Button
-                  type="submit"
-                  fullWidth
-                  variant="raised"
-                  color="primary"
-                  className={classes.submit}
+        {service &&
+          service.id && (
+            <Grid
+              container
+              justify="center"
+              spacing={24}
+              style={{ marginTop: 20 }}
+            >
+              <Grid item xs={12} sm={3}>
+                <ServiceCard
+                  title={service.title}
+                  image={service.image}
+                  description={service.description}
+                  price={contract.web3.utils.fromWei(
+                    service.minimumPrice,
+                    'ether'
+                  )}
+                  buttonText=""
+                />
+              </Grid>
+              <Grid item xs={12} sm={3}>
+                <Typography variant="headline">Create Quote</Typography>
+                <form
+                  className={classes.form}
+                  onSubmit={this.createNewService}
+                  encType="multipart/form-data"
                 >
+                  <FormControl margin="normal" fullWidth error={!!error.buyer}>
+                    <InputLabel htmlFor="buyer">Buyer Address</InputLabel>
+                    <Input
+                      id="buyer"
+                      name="buyer"
+                      value={buyer}
+                      onChange={this.handleChange}
+                      autoFocus
+                      maxLength="30"
+                    />
+                    <FormHelperText>
+                      {error.buyer ? error.buyer : ''}
+                    </FormHelperText>
+                  </FormControl>
+                  <FormControl margin="normal" fullWidth error={!!error.price}>
+                    <InputLabel htmlFor="price">Price</InputLabel>
+                    <Input
+                      id="price"
+                      name="price"
+                      type="number"
+                      value={price}
+                      onChange={this.handleChange}
+                      endAdornment={
+                        <InputAdornment position="end">ETH</InputAdornment>
+                      }
+                    />
+                    <FormHelperText>
+                      {error.price ? error.price : ''}
+                    </FormHelperText>
+                  </FormControl>
+                  <Button
+                    type="submit"
+                    fullWidth
+                    variant="raised"
+                    color="primary"
+                    className={classes.submit}
+                  >
                     Create
-                </Button>
-              </form>
-              {sellerOrders.map(order => (
-                <div>{order.buyer}</div>
-              ))}
+                  </Button>
+                </form>
+                {this.props.order &&
+                  this.props.order.order.transactionHash &&
+                  !this.props.order.ready && (
+                    <p className="transaction-wait">
+                      We are creating your order please wait. Transaction:
+                      {this.props.order.order.transactionHash}
+                    </p>
+                  )}
+
+                {this.props.order &&
+                  this.props.order.order.transactionHash &&
+                  this.props.order.ready && (
+                    <p className="transaction-ready">
+                      Your order is ready!. Transaction:
+                      {this.props.order.order.transactionHash}
+                    </p>
+                  )}
+              </Grid>
             </Grid>
-          </Grid>
-        )}
+          )}
       </div>
     );
   }
@@ -247,6 +260,10 @@ Quote.propTypes = {
     service: PropTypes.object,
     price: PropTypes.string
   }).isRequired,
+  order: PropTypes.shape({
+    order: PropTypes.object,
+    ready: PropTypes.bool
+  }).isRequired,
   createOrder: PropTypes.func.isRequired
 };
 
@@ -256,27 +273,28 @@ Quote.defaultProps = {
 
 const mapStateToProps = (state, props) => {
   let service = {};
-  let sellerOrders = [];
+  // let sellerOrders = [];
   if (state.serviceList.data.length > 0) {
     service = state.serviceList.data.filter(
       item => item.id === props.match.params.serviceId
     );
   }
-  if (state.orderList.sellerOrders.length > 0) {
+  /* if (state.orderList.sellerOrders.length > 0) {
     sellerOrders = state.orderList.sellerOrders.filter(
       order => order.serviceId === props.match.params.serviceId
     );
-  }
+  } */
   return {
     contract: state.contract,
     serviceList: state.serviceList,
     service: service[0],
-    sellerOrders
+    order: state.order
   };
 };
 
 const mapDispatchToProps = dispatch => ({
-  createOrder: (serviceId, price, buyer) => dispatch(createOrder(serviceId, price, buyer))
+  createOrder: (serviceId, price, buyer) =>
+    dispatch(createOrder(serviceId, price, buyer))
 });
 
 export default connect(

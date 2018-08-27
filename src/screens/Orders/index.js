@@ -15,17 +15,6 @@ import OrderCard from '../../components/OrderCard';
 import './style.css';
 
 class Orders extends Component {
-  handleClick = (orderId, state, price) => {
-    console.log('acceptOrder', state);
-    if (Number(state) === 0) {
-      console.log('acceptOrder', orderId);
-      this.props.acceptOrder(
-        orderId,
-        this.props.contract.web3.utils.toWei(price, 'ether')
-      );
-    }
-  };
-
   getLabel = (state, type) => {
     console.log(type);
     if (type === 'seller') {
@@ -52,23 +41,55 @@ class Orders extends Component {
     return '';
   };
 
+  handleClick = (orderId, state, price) => {
+    if (Number(state) === 0) {
+      this.props.acceptOrder(
+        orderId,
+        this.props.contract.web3.utils.toWei(price, 'ether')
+      );
+    }
+  };
+
   render() {
     return (
       <div>
-        <h1>Orders</h1>
-        {this.props.orderList &&
-          this.props.orderList.sellerOrders.length > 0 && <h2>Buy Orders</h2>}
+        <h1>
+Orders
+        </h1>
+        {this.props.orderList
+          && this.props.orderList.sellerOrders.length > 0 && (
+          <h2>
+Buy Orders
+          </h2>
+        )}
+        {this.props.orderAccept
+          && this.props.orderAccept.hash.transactionHash
+          && !this.props.orderAccept.ready && (
+          <p className="transaction-wait">
+              We are creating your order please wait. Transaction:
+            {this.props.orderAccept.hash.transactionHash}
+          </p>
+        )}
+
+        {this.props.orderAccept
+          && this.props.orderAccept.hash.transactionHash
+          && this.props.orderAccept.ready && (
+          <p className="transaction-ready">
+              Your order is ready!. Transaction:
+            {this.props.orderAccept.hash.transactionHash}
+          </p>
+        )}
         <Grid container spacing={24}>
-          {this.props.orderList &&
-            this.props.orderList.sellerOrders.map(order => (
+          {this.props.orderList
+            && this.props.orderList.sellerOrders.map(order => (
               <Grid key={order.id} item xs={12} sm={3}>
                 <OrderCard
                   title={order.service.title}
                   price={
-                    this.props.contract &&
-                    this.props.contract.web3 &&
-                    this.props.contract.web3.utils &&
-                    this.props.contract.web3.utils.fromWei(order.price, 'ether')
+                    this.props.contract
+                    && this.props.contract.web3
+                    && this.props.contract.web3.utils
+                    && this.props.contract.web3.utils.fromWei(order.price, 'ether')
                   }
                   id={order.id}
                   buyer={order.buyer}
@@ -81,19 +102,23 @@ class Orders extends Component {
               </Grid>
             ))}
         </Grid>
-        {this.props.orderList &&
-          this.props.orderList.buyerOrders.length > 0 && <h2>Sell Orders</h2>}
+        {this.props.orderList
+          && this.props.orderList.buyerOrders.length > 0 && (
+          <h2>
+Sell Orders
+          </h2>
+        )}
         <Grid container spacing={24}>
-          {this.props.orderList &&
-            this.props.orderList.buyerOrders.map(order => (
+          {this.props.orderList
+            && this.props.orderList.buyerOrders.map(order => (
               <Grid key={order.id} item xs={12} sm={3}>
                 <OrderCard
                   title={order.service.title}
                   price={
-                    this.props.contract &&
-                    this.props.contract.web3 &&
-                    this.props.contract.web3.utils &&
-                    this.props.contract.web3.utils.fromWei(order.price, 'ether')
+                    this.props.contract
+                    && this.props.contract.web3
+                    && this.props.contract.web3.utils
+                    && this.props.contract.web3.utils.fromWei(order.price, 'ether')
                   }
                   id={order.id}
                   buyer="You"
@@ -112,12 +137,13 @@ class Orders extends Component {
 }
 
 Orders.propTypes = {
-  serviceList: PropTypes.shape({
-    data: PropTypes.array
-  }).isRequired,
   orderList: PropTypes.shape({
     sellerOrders: PropTypes.array,
     buyerOrders: PropTypes.array
+  }).isRequired,
+  orderAccept: PropTypes.shape({
+    hash: PropTypes.string,
+    ready: PropTypes.bool
   }).isRequired,
   contract: PropTypes.shape({
     web3: PropTypes.object,
@@ -129,7 +155,8 @@ Orders.propTypes = {
 const mapStateToProps = state => ({
   contract: state.contract,
   serviceList: state.serviceList,
-  orderList: state.orderList
+  orderList: state.orderList,
+  orderAccept: state.orderAccept
 });
 
 const mapDispatchToProps = dispatch => ({

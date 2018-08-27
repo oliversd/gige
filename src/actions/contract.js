@@ -2,6 +2,7 @@ import Web3 from 'web3';
 import { contractActions } from '../config/actions';
 import GigEService from '../contracts/GigEService.json';
 import { serviceSetReady, getServiceList } from './service';
+import { orderSetReady, getOrderList, orderAcceptSetReady } from './order';
 import contractConfig from '../config/contract';
 
 function contractIsLoading() {
@@ -79,6 +80,21 @@ const setEvents = () => (dispatch) => {
   instance.events
     .OrderProposal()
     .on('data', (event) => {
+      dispatch(orderSetReady());
+      dispatch(getOrderList());
+      console.log(event);
+    })
+    .on('changed', (event) => {
+      // remove event from local database
+      console.log(event);
+    })
+    .on('error', console.error);
+
+  instance.events
+    .OrderAccepted()
+    .on('data', (event) => {
+      dispatch(orderAcceptSetReady());
+      dispatch(getOrderList());
       console.log(event);
     })
     .on('changed', (event) => {

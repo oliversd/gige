@@ -47,16 +47,6 @@ function WithAsyncWeb3(Component) {
       } else {
         this.props.getServiceList();
         this.props.getOrderList();
-        this.props.contract.instance.events
-          .ServiceCreated()
-          .on('data', event => {
-            console.log('Created data web3', event);
-          })
-          .on('changed', event => {
-            // remove event from local database
-            console.log(event);
-          })
-          .on('error', error => console.error(error));
       }
     }
 

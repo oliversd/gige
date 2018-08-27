@@ -14,7 +14,8 @@ const ServiceCard = ({
   description,
   price,
   buttonText,
-  link
+  link,
+  isSeller
 }) => (
   <React.Fragment>
     <Card>
@@ -28,23 +29,34 @@ const ServiceCard = ({
         >
           {title}
         </Typography>
-        <Typography component="p">{description}</Typography>
+        <Typography component="p">
+          {description}
+        </Typography>
+        {isSeller && (
+          <Typography gutterBottom component="p" style={{ fontSize: '0.7rem' }}>
+            You are the seller of this service
+          </Typography>
+        )}
       </CardContent>
-      <CardActions>
-        <Button
-          component={Link}
-          to={link}
-          size="small"
-          variant="raised"
-          color="primary"
-          style={{ width: '30%' }}
-        >
-          {buttonText}
-        </Button>
-        <div style={{ width: '70%', textAlign: 'right' }}>
-          <Typography component="p">{`starting at ${price} ETH`}</Typography>
-        </div>
-      </CardActions>
+      {buttonText && (
+        <CardActions>
+          <Button
+            component={Link}
+            to={link}
+            size="small"
+            variant="raised"
+            color="primary"
+            style={{ width: '30%' }}
+          >
+            {buttonText}
+          </Button>
+          <div style={{ width: '70%', textAlign: 'right' }}>
+            <Typography component="p">
+              {`starting at ${price} ETH`}
+            </Typography>
+          </div>
+        </CardActions>
+      )}
     </Card>
   </React.Fragment>
 );
@@ -54,6 +66,7 @@ ServiceCard.propTypes = {
   image: PropTypes.string.isRequired,
   description: PropTypes.string.isRequired,
   price: PropTypes.string.isRequired,
+  isSeller: PropTypes.bool.isRequired,
   buttonText: PropTypes.string,
   link: PropTypes.string
 };
